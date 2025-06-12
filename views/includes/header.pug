@@ -1,0 +1,90 @@
+header.header
+  .container
+    .header-content
+      .logo
+        a(href="/")
+          h1 PinArtesans
+      
+      .search-bar
+        i.fas.fa-search
+        input(type="text", placeholder="Buscar personas...", id="searchInput")
+      
+      nav.nav-icons
+        button.nav-btn
+          i.fas.fa-home
+        button.nav-btn
+          i.fas.fa-compass
+        a.nav-btn(href="/upload")
+          i.fas.fa-cloud-upload-alt
+        
+        if user
+          // Botón de notificaciones separado
+          .notifications-menu
+            button.notifications-btn(id="notificationsToggle")
+              i.fas.fa-bell
+              .notification-badge(id="notificationCount", style="display: none;")
+            
+            .notifications-dropdown(id="notificationsDropdown")
+              .dropdown-header
+                h4 Notificaciones
+              
+              .notifications-list(id="notificationsList")
+                // Las notificaciones se cargarán dinámicamente
+              
+              .dropdown-footer
+                a.view-all-link(href="/notifications") Ver todas las notificaciones
+          
+          // Usuario autenticado - mostrar avatar y menú
+          .user-menu
+            .user-avatar(id="userMenuToggle")
+              if user.imagen_perfil
+                img(src=user.imagen_perfil, alt=user.nombre)
+              else
+                img(src="/uploads/profiles/default.png", alt=user.nombre)
+              span.user-name= user.nombre
+              i.fas.fa-chevron-down.dropdown-icon
+            
+            .dropdown-menu(id="userDropdown")
+              .dropdown-header
+                .user-info
+                  if user.imagen_perfil
+                    img.user-avatar-large(src=user.imagen_perfil, alt=user.nombre)
+                  else
+                    img.user-avatar-large(src="/uploads/profiles/default.png", alt=user.nombre)
+                  .user-details
+                    h4= user.nombre
+                    p= user.email
+                    if user.moderador
+                      span.moderator-badge
+                        i.fas.fa-shield-alt
+                        | Moderador
+              
+              .dropdown-divider
+              
+              .dropdown-items
+                a.dropdown-item(href="/profile")
+                  i.fas.fa-user
+                  span Mi Perfil
+                
+                a.dropdown-item(href="/albums")
+                  i.fas.fa-images
+                  span Mis Álbumes
+                
+                a.dropdown-item(href="/settings")
+                  i.fas.fa-cog
+                  span Configuración
+                
+                if user.moderador
+                  .dropdown-divider
+                  a.dropdown-item(href="/admin")
+                    i.fas.fa-shield-alt
+                    span Panel de Moderación
+                
+                .dropdown-divider
+                
+                a.dropdown-item.logout-item(href="/logout")
+                  i.fas.fa-sign-out-alt
+                  span Cerrar Sesión
+        else
+          // Usuario no autenticado - mostrar botón de login
+          a.login-btn(href="/login") Iniciar Sesión

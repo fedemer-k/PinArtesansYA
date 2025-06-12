@@ -1,0 +1,94 @@
+extends layout
+
+block content
+  .settings-container
+    .settings-card
+      .settings-header
+        h2 Configuración de la cuenta
+        p Administra tu información personal y preferencias
+      
+      if error
+        .error-message
+          i.fas.fa-exclamation-circle
+          span= error
+      
+      if success
+        .success-message
+          i.fas.fa-check-circle
+          span= success
+      
+      form.settings-form(method="POST", action="/settings", enctype="multipart/form-data")
+        .form-section
+          h3 Información personal
+          
+          .form-row
+            .form-group.readonly
+              label(for="name") Nombre completo
+              .input-group
+                i.fas.fa-user
+                input(type="text", id="name", name="name", value=user.nombre, readonly)
+                .readonly-indicator
+                  i.fas.fa-lock
+            
+            .form-group.readonly
+              label(for="email") Correo electrónico
+              .input-group
+                i.fas.fa-envelope
+                input(type="email", id="email", name="email", value=user.email, readonly)
+                .readonly-indicator
+                  i.fas.fa-lock
+          
+          .form-group
+            label(for="profileImage") Imagen de perfil
+            .profile-image-section
+              .current-image
+                if user.imagen_perfil
+                  img(src=user.imagen_perfil, alt="Imagen actual", id="currentProfileImage")
+                else
+                  img(src="https://picsum.photos/120/120?random=user", alt="Imagen por defecto", id="currentProfileImage")
+              .file-input-group
+                input(type="file", id="profileImage", name="profileImage", accept="image/*")
+                .file-input-label
+                  i.fas.fa-camera
+                  span Cambiar imagen
+          
+          .form-group.readonly
+            label(for="registrationDate") Fecha de registro
+            .input-group
+              i.fas.fa-calendar
+              input(type="text", id="registrationDate", value=user.fecha_registro, readonly)
+              .readonly-indicator
+                i.fas.fa-lock
+        
+        .form-section
+          h3 Preferencias de cuenta
+          
+          .form-group
+            label(for="interests") Intereses y especialidades
+            .input-group.textarea-group
+              i.fas.fa-palette
+              textarea(id="interests", name="interests", placeholder="Describe tus intereses artísticos, técnicas que dominas, materiales favoritos, etc.", rows="4")= user.intereses || ''
+          
+          .form-group
+            .checkbox-group.showcase-toggle
+              input(type="checkbox", id="showcaseMode", name="showcaseMode", checked=user.modo_vitrina)
+              label(for="showcaseMode") 
+                .toggle-content
+                  .toggle-info
+                    strong Modo Vitrina
+                    p Permite que otros usuarios vean tu perfil como una galería profesional
+                  .toggle-switch
+                    .toggle-slider
+        
+        if user.moderador
+          .form-section.moderator-section
+            h3 Estado de moderador
+            .moderator-info
+              .moderator-badge-large
+                i.fas.fa-shield-alt
+                span Moderador Activo
+              p Tienes permisos especiales para moderar contenido y gestionar la comunidad.
+        
+        .form-actions
+          button.save-btn(type="submit") Guardar cambios
+          a.cancel-btn(href="/") Cancelar

@@ -1,0 +1,7 @@
+section.stories-section
+  .stories-container
+    each story in stories
+      .story-item
+        .story-avatar
+          img(src=story.avatar, alt=story.username)
+        span.story-username= story.username

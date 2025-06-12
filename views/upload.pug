@@ -1,0 +1,95 @@
+extends layout
+
+block content
+  .upload-container
+    .upload-card
+      .upload-header
+        h2 Subir Imágenes
+        p Comparte tus creaciones artesanales con la comunidad
+      
+      if error
+        .error-message
+          i.fas.fa-exclamation-circle
+          span= error
+      
+      form.upload-form(id="uploadForm", enctype="multipart/form-data")
+        .form-section
+          h3 Seleccionar Álbum
+          
+          .album-selector
+            select(id="albumSelect", name="albumId")
+              option(value="") Seleccionar álbum existente...
+              each album in albums
+                option(value=album.id_album)= album.titulo
+          
+          .new-album-section(id="newAlbumSection")
+            .form-group
+              label(for="newAlbumName") O crear nuevo álbum:
+              .input-group
+                i.fas.fa-folder-plus
+                input(type="text", id="newAlbumName", name="newAlbumName", placeholder="Nombre del nuevo álbum")
+        
+        .form-section
+          h3 Seleccionar Imágenes
+          
+          .file-upload-area(id="fileUploadArea")
+            input(type="file", id="imageFiles", name="images", multiple, accept="image/*", style="display: none;")
+            .upload-placeholder
+              i.fas.fa-cloud-upload-alt
+              h4 Arrastra imágenes aquí o haz click para seleccionar
+              p Máximo 10 imágenes, 10MB cada una
+        
+        .images-preview(id="imagesPreview")
+          // Las previsualizaciones aparecerán aquí
+        
+        .form-actions
+          button.upload-btn(type="submit", disabled) Subir Imágenes
+          a.cancel-btn(href="/") Cancelar
+
+  // Modal para configurar privacidad de imagen específica
+  .modal(id="privacyModal")
+    .modal-content
+      .modal-header
+        h3 Configurar Privacidad
+        button.modal-close(id="closePrivacyModal")
+          i.fas.fa-times
+      
+      .modal-body
+        .image-preview-modal(id="modalImagePreview")
+        
+        .privacy-form
+          .form-group
+            label(for="imageTitle") Título de la imagen:
+            input(type="text", id="imageTitle", placeholder="Título opcional")
+          
+          .form-group
+            label(for="imageDescription") Descripción:
+            textarea(id="imageDescription", placeholder="Descripción opcional", rows="3")
+          
+          .form-group
+            label(for="privacyLevel") Nivel de privacidad:
+            select(id="privacyLevel")
+              option(value="0") Privada (solo yo)
+              option(value="1", selected) Seguidores
+              option(value="2") Pública (modo vitrina)
+              option(value="3") Usuario específico
+          
+          .shared-users-section(id="sharedUsersSection", style="display: none;")
+            label Compartir con:
+            .followers-list(id="followersList")
+              each follower in followers
+                .follower-item
+                  input(type="checkbox", id=`follower_${follower.id_usuario}`, value=follower.id_usuario)
+                  label(for=`follower_${follower.id_usuario}`)
+                    if follower.imagen_perfil
+                      img(src=follower.imagen_perfil, alt=follower.nombre)
+                    else
+                      img(src="/uploads/profiles/default.png", alt=follower.nombre)
+                    span= follower.nombre
+      
+      .modal-footer
+        button.save-privacy-btn(id="savePrivacyBtn") Guardar
+        button.cancel-privacy-btn(id="cancelPrivacyBtn") Cancelar
+
+block append scripts
+  script(src="/js/upload.js")

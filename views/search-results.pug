@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  include includes/follows
+  
+  section.content-search-section
+    .content-search-container
+      form.content-search-form(action="/search" method="GET")
+        .content-search-bar
+          i.fas.fa-images
+          input(type="text", name="q", placeholder="Buscar imágenes y álbumes...", id="contentSearchInput", value=query)
+          button.search-button(type="submit")
+            i.fas.fa-search
+            span Buscar
+      
+      .content-search-results
+        .search-results-header
+          h3 Resultados de búsqueda
+          .results-count #{resultsCount} resultado(s) para "#{query}"
+        
+        if hasResults
+          .content-grid
+            each image in images
+              .gallery-item(data-id=image.id)
+                img(src=image.src, alt=image.title || `Imagen ${image.id}`, loading="lazy")
+                .gallery-overlay
+                  .overlay-stats
+                    .stat-item
+                      i.fas.fa-heart
+                      span.likes-count= image.likes
+                    .stat-item
+                      i.fas.fa-comment
+                      span= image.comments
+                  if image.owner
+                    .overlay-owner
+                      span Por: #{image.owner}
+        else
+          .no-content-results
+            .no-results-icon
+              i.fas.fa-image
+            h3 No se encontraron imágenes
+            p Intenta con otros términos de búsqueda

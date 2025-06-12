@@ -1,0 +1,70 @@
+extends layout
+
+block content
+  .albums-container
+    .albums-header
+      h2 Mis Álbumes
+      button.create-album-btn(id="createAlbumBtn")
+        i.fas.fa-plus
+        span Crear Álbum
+    
+    .albums-grid(id="albumsGrid")
+      each album in albums
+        .album-card(data-album-id=album.id_album)
+          .album-cover
+            img(src=album.cover_image, alt=album.titulo)
+            .album-overlay
+              .album-stats
+                .stat-item
+                  i.fas.fa-images
+                  span #{album.image_count} imagen(es)
+                if album.last_updated
+                  .stat-item
+                    i.fas.fa-clock
+                    span= new Date(album.last_updated).toLocaleDateString('es-ES')
+          
+          .album-info
+            h3.album-title= album.titulo
+            .album-actions
+              button.view-album-btn(onclick=`window.location.href='/albums/${album.id_album}'`)
+                i.fas.fa-eye
+                span Ver
+              button.edit-album-btn(data-album-id=album.id_album, data-album-title=album.titulo)
+                i.fas.fa-edit
+                span Editar
+              button.delete-album-btn(data-album-id=album.id_album, data-album-title=album.titulo, data-image-count=album.image_count)
+                i.fas.fa-trash
+                span Eliminar
+      
+      if !albums || albums.length === 0
+        .no-albums
+          i.fas.fa-folder-open
+          h3 No tienes álbumes aún
+          p Crea tu primer álbum para organizar tus imágenes
+          button.create-album-btn.primary-btn
+            i.fas.fa-plus
+            span Crear mi primer álbum
+
+  // Modal para crear/editar álbum
+  .modal(id="albumModal")
+    .modal-content
+      .modal-header
+        h3(id="modalTitle") Crear Álbum
+        button.modal-close(id="closeAlbumModal")
+          i.fas.fa-times
+      
+      .modal-body
+        form.album-form(id="albumForm")
+          .form-group
+            label(for="albumTitle") Título del álbum
+            input(type="text", id="albumTitle", name="titulo", placeholder="Nombre del álbum", required, maxlength="100")
+            .character-count
+              span.current-count 0
+              span /100
+          
+          .form-actions
+            button.cancel-btn(type="button", id="cancelAlbumBtn") Cancelar
+            button.save-btn(type="submit", id="saveAlbumBtn") Crear Álbum
+
+block append scripts
+  script(src="/js/albums.js")

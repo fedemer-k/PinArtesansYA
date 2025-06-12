@@ -1,0 +1,67 @@
+extends layout
+
+block header
+  header.header.auth-header
+    .container
+      .header-content
+        .logo
+          a(href="/")
+            h1 PinArtesans
+        nav.auth-nav
+          a(href="/register") ¿No tienes cuenta? Regístrate
+
+block content
+  .auth-container
+    .auth-card
+      .auth-header
+        h2 Iniciar Sesión
+        p Bienvenido de vuelta a la comunidad de artesanos
+      
+      if error
+        .error-message
+          i.fas.fa-exclamation-circle
+          span= error
+      
+      if query && query.register === 'success'
+        .success-message
+          i.fas.fa-check-circle
+          span Cuenta creada exitosamente. Ahora puedes iniciar sesión.
+      
+      form.auth-form(method="POST", action="/login")
+        .form-group
+          label(for="email") Correo electrónico
+          .input-group
+            i.fas.fa-envelope
+            input(type="email", id="email", name="email", placeholder="tu@email.com", required)
+        
+        .form-group
+          label(for="password") Contraseña
+          .input-group
+            i.fas.fa-lock
+            input(type="password", id="password", name="password", placeholder="Tu contraseña", required)
+        
+        .form-options
+          .checkbox-group
+            input(type="checkbox", id="remember", name="remember")
+            label(for="remember") Recordarme
+          a.forgot-link(href="#") ¿Olvidaste tu contraseña?
+        
+        button.auth-btn(type="submit") Iniciar Sesión
+      
+      .auth-divider
+        span o
+      
+      .social-login
+        button.social-btn.google-btn
+          i.fab.fa-google
+          span Continuar con Google
+        button.social-btn.facebook-btn
+          i.fab.fa-facebook-f
+          span Continuar con Facebook
+      
+      .auth-footer
+        p ¿No tienes una cuenta? 
+          a(href="/register") Crear cuenta
+
+block footer
+  // No footer en páginas de autenticación

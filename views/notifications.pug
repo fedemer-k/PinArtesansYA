@@ -1,0 +1,108 @@
+extends layout
+
+block content
+  .notifications-page
+    .notifications-header
+      h2 Notificaciones
+      .notifications-actions
+        button.mark-all-read(id="markAllRead") Marcar todas como leídas
+        button.filter-btn(id="filterBtn")
+          i.fas.fa-filter
+          span Filtrar
+    
+    .notifications-filters(id="notificationsFilters", style="display: none;")
+      .filter-options
+        button.filter-option.active(data-filter="all") Todas
+        button.filter-option(data-filter="follow") Seguimiento
+        button.filter-option(data-filter="events") Eventos
+        button.filter-option(data-filter="likes") Likes
+        button.filter-option(data-filter="comments") Comentarios
+    
+    .notifications-list-full
+      each notification in notifications || []
+        .notification-item-full(class=notification.leida ? '' : 'unread', data-notification-id=notification.id_notificacion)
+          .notification-avatar
+            if notification.imagen_perfil
+              img(src=notification.imagen_perfil, alt="Usuario")
+            else
+              img(src="/uploads/profiles/default.png", alt="Usuario")
+          .notification-content
+            p= notification.mensaje
+            span.notification-time= notification.fecha
+          .notification-actions
+            if notification.tipo && notification.tipo.includes('Seguimiento') && notification.id_tiponotificacion === 1 && notification.follow_request_id
+              // Solicitud de seguimiento pendiente - mostrar los 3 botones
+              .follow-request-actions
+                button.accept-request-btn(data-request-id=notification.follow_request_id, title="Aceptar solicitud")
+                  i.fas.fa-user-check
+                  span Aceptar
+                button.reject-request-btn(data-request-id=notification.follow_request_id, title="Rechazar solicitud")
+                  i.fas.fa-user-times
+                  span Rechazar
+                button.mark-read-btn(data-id=notification.id_notificacion, title="Marcar como leída")
+                  i.fas.fa-check-circle
+                  span Leída
+            else
+              // Notificación normal - solo botón de marcar como leída
+              .normal-actions
+                if !notification.leida
+                  button.mark-read-btn(data-id=notification.id_notificacion, title="Marcar como leída")
+                    i.fas.fa-check-circle
+                    span Marcar como leída
+                else
+                  .read-indicator
+                    i.fas.fa-check-double
+                    span Leída
+      
+      // Datos de ejemplo si no hay notificaciones reales
+      if !notifications || notifications.length === 0
+        .notification-item-full.unread
+          .notification-avatar
+            img(src="/uploads/profiles/default.png", alt="Usuario")
+          .notification-content
+            p
+              strong artesano1 
+              | te ha enviado una solicitud de seguimiento
+            span.notification-time hace 2 horas
+          .notification-actions
+            .follow-request-actions
+              button.accept-request-btn(data-request-id="1", title="Aceptar solicitud")
+                i.fas.fa-user-check
+                span Aceptar
+              button.reject-request-btn(data-request-id="1", title="Rechazar solicitud")
+                i.fas.fa-user-times
+                span Rechazar
+              button.mark-read-btn(data-id="1", title="Marcar como leída")
+                i.fas.fa-check-circle
+                span Leída
+        
+        .notification-item-full
+          .notification-avatar
+            img(src="/uploads/profiles/default.png", alt="Usuario")
+          .notification-content
+            p
+              strong ceramista 
+              | comentó: "¡Increíble trabajo! Me encanta la textura que lograste."
+            span.notification-time hace 4 horas
+          .notification-actions
+            .normal-actions
+              .read-indicator
+                i.fas.fa-check-double
+                span Leída
+        
+        .notification-item-full.unread
+          .notification-avatar
+            img(src="/uploads/profiles/default.png", alt="Usuario")
+          .notification-content
+            p
+              strong tejedor 
+              | comenzó a seguirte
+            span.notification-time hace 1 día
+          .notification-actions
+            .normal-actions
+              button.mark-read-btn(data-id="3", title="Marcar como leída")
+                i.fas.fa-check-circle
+                span Marcar como leída
+    
+    .load-more-notifications
+      button.load-more-btn(id="loadMoreNotifications") Cargar más notificaciones

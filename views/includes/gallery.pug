@@ -1,0 +1,26 @@
+section.gallery-section
+  if images && images.length > 0
+    .gallery-grid(id="galleryGrid")
+      each image in images
+        .gallery-item(data-id=image.id)
+          img(src=image.src, alt=`Imagen ${image.id}`, loading="lazy")
+          .gallery-overlay
+            .overlay-stats
+              .stat-item
+                i.fas.fa-heart
+                span.likes-count= image.likes || 0
+              .stat-item
+                i.fas.fa-comment
+                span= image.comments || 0
+    
+    .load-more-container
+      button.load-more-btn(id="loadMoreBtn")
+        span.btn-text Cargar más imágenes
+        .loading-spinner(style="display: none;")
+          i.fas.fa-spinner.fa-spin
+  else
+    .no-images
+      .no-images-content
+        i.fas.fa-images
+        h3 No hay imágenes disponibles
+        p= user ? "Los usuarios que sigues no han subido imágenes aún" : "No hay imágenes públicas disponibles"

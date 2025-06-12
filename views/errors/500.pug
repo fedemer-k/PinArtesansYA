@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  .error-container
+    .error-card
+      .error-icon
+        i.fas.fa-exclamation-triangle
+      h1.error-title 500
+      h2.error-subtitle Error del servidor
+      p.error-message Lo sentimos, ha ocurrido un error en el servidor. Por favor, inténtalo de nuevo más tarde.
+      .error-actions
+        a.primary-btn(href="/") Volver al inicio
+      
+      if error && error.stack
+        .error-details
+          pre= error.stack

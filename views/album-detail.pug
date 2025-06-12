@@ -1,0 +1,165 @@
+extends layout
+
+block content
+  .album-detail-container
+    .album-header
+      .album-info
+        h2.album-title= album.titulo
+        p.album-meta #{images.length} imagen(es)
+      
+      .album-actions
+        button.edit-album-btn(data-album-id=album.id_album, data-album-title=album.titulo)
+          i.fas.fa-edit
+          span Editar Álbum
+        a.upload-to-album-btn(href=`/upload?album=${album.id_album}`)
+          i.fas.fa-plus
+          span Agregar Imágenes
+    
+    if images && images.length > 0
+      .images-grid(id="imagesGrid")
+        each image in images
+          .image-card(data-image-id=image.id_imagen)
+            .image-preview
+              img(src=image.ruta_imagen, alt=image.titulo || 'Imagen', onclick=`window.location.href='/image/${image.id_imagen}'`)
+              .image-overlay
+                .overlay-stats
+                  .stat-item
+                    i.fas.fa-comment
+                    span= image.comments_count
+                  if image.privacidad === 3 && image.shared_count > 0
+                    .stat-item
+                      i.fas.fa-share
+                      span= image.shared_count
+                .privacy-indicator(class=`privacy-${image.privacidad}`)
+                  if image.privacidad === 0
+                    i.fas.fa-lock(title="Privada")
+                  else if image.privacidad === 1
+                    i.fas.fa-users(title="Seguidores")
+                  else if image.privacidad === 2
+                    i.fas.fa-globe(title="Pública")
+                  else if image.privacidad === 3
+                    i.fas.fa-user-friends(title="Usuario específico")
+            
+            .image-info
+              h4.image-title= image.titulo || 'Sin título'
+              if image.descripcion
+                p.image-description= image.descripcion.substring(0, 100) + (image.descripcion.length > 100 ? '...' : '')
+              
+              .image-actions
+                button.edit-image-btn(data-image-id=image.id_imagen)
+                  i.fas.fa-edit
+                  span Editar
+                button.move-image-btn(data-image-id=image.id_imagen)
+                  i.fas.fa-arrows-alt
+                  span Mover
+                button.delete-image-btn(data-image-id=image.id_imagen, data-image-title=image.titulo)
+                  i.fas.fa-trash
+                  span Eliminar
+    else
+      .no-images
+        i.fas.fa-images
+        h3 Este álbum está vacío
+        p Agrega algunas imágenes para comenzar
+        a.primary-btn(href=`/upload?album=${album.id_album}`)
+          i.fas.fa-plus
+          span Agregar Imágenes
+
+  // Modal para editar álbum
+  .modal(id="albumModal")
+    .modal-content
+      .modal-header
+        h3 Editar Álbum
+        button.modal-close(id="closeAlbumModal")
+          i.fas.fa-times
+      
+      .modal-body
+        form.album-form(id="albumForm")
+          .form-group
+            label(for="albumTitle") Título del álbum
+            input(type="text", id="albumTitle", name="titulo", required, maxlength="100")
+            .character-count
+              span.current-count 0
+              span /100
+          
+          .form-actions
+            button.cancel-btn(type="button", id="cancelAlbumBtn") Cancelar
+            button.save-btn(type="submit") Guardar Cambios
+
+  // Modal para editar imagen
+  .modal(id="imageModal")
+    .modal-content
+      .modal-header
+        h3 Editar Imagen
+        button.modal-close(id="closeImageModal")
+          i.fas.fa-times
+      
+      .modal-body
+        form.image-form(id="imageForm", enctype="multipart/form-data")
+          .image-preview-section
+            .current-image-preview(id="currentImagePreview")
+            .file-input-group
+              input(type="file", id="newImageFile", name="newImage", accept="image/*")
+              .file-input-label
+                i.fas.fa-camera
+                span Cambiar imagen
+          
+          .form-group
+            label(for="imageTitle") Título
+            input(type="text", id="imageTitle", name="titulo", maxlength="255")
+          
+          .form-group
+            label(for="imageDescription") Descripción
+            textarea(id="imageDescription", name="descripcion", rows="4", maxlength="1000")
+            .character-count
+              span.current-count 0
+              span /1000
+          
+          .form-group
+            label(for="imagePrivacy") Privacidad
+            select(id="imagePrivacy", name="privacidad")
+              option(value="0") Privada (solo yo)
+              option(value="1") Seguidores
+              option(value="2") Pública (modo vitrina)
+              option(value="3") Usuario específico
+          
+          .shared-users-section(id="sharedUsersSection", style="display: none;")
+            label Compartir con:
+            .followers-list(id="followersList")
+              each follower in followers
+                .follower-item
+                  input(type="checkbox", id=`follower_${follower.id_usuario}`, name="sharedUsers", value=follower.id_usuario)
+                  label(for=`follower_${follower.id_usuario}`)
+                    if follower.imagen_perfil
+                      img(src=follower.imagen_perfil, alt=follower.nombre)
+                    else
+                      img(src="/uploads/profiles/default.png", alt=follower.nombre)
+                    span= follower.nombre
+          
+          .form-actions
+            button.cancel-btn(type="button", id="cancelImageBtn") Cancelar
+            button.save-btn(type="submit") Guardar Cambios
+
+  // Modal para mover imagen
+  .modal(id="moveModal")
+    .modal-content
+      .modal-header
+        h3 Mover Imagen
+        button.modal-close(id="closeMoveModal")
+          i.fas.fa-times
+      
+      .modal-body
+        form.move-form(id="moveForm")
+          .form-group
+            label(for="targetAlbum") Mover a álbum:
+            select(id="targetAlbum", name="newAlbumId", required)
+              option(value="") Seleccionar álbum...
+              each albumOption in albums || []
+                if albumOption.id_album !== album.id_album
+                  option(value=albumOption.id_album)= albumOption.titulo
+          
+          .form-actions
+            button.cancel-btn(type="button", id="cancelMoveBtn") Cancelar
+            button.save-btn(type="submit") Mover Imagen
+
+block append scripts
+  script(src="/js/album-detail.js")

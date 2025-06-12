@@ -1,0 +1,88 @@
+extends layout
+
+block header
+  header.header.auth-header
+    .container
+      .header-content
+        .logo
+          a(href="/")
+            h1 PinArtesans
+        nav.auth-nav
+          a(href="/login") ¿Ya tienes cuenta? Inicia sesión
+
+block content
+  .auth-container
+    .auth-card
+      .auth-header
+        h2 Crear Cuenta
+        p Únete a la comunidad de artesanos más grande
+      
+      if error
+        .error-message
+          i.fas.fa-exclamation-circle
+          span= error
+      
+      form.auth-form(method="POST", action="/register", enctype="multipart/form-data")
+        .form-group
+          label(for="name") Nombre completo
+          .input-group
+            i.fas.fa-user
+            input(type="text", id="name", name="name", placeholder="Tu nombre completo", required)
+        
+        .form-group
+          label(for="email") Correo electrónico
+          .input-group
+            i.fas.fa-envelope
+            input(type="email", id="email", name="email", placeholder="tu@email.com", required)
+        
+        .form-group
+          label(for="password") Contraseña
+          .input-group
+            i.fas.fa-lock
+            input(type="password", id="password", name="password", placeholder="Mínimo 8 caracteres", required, minlength="8")
+        
+        .form-group
+          label(for="confirmPassword") Confirmar contraseña
+          .input-group
+            i.fas.fa-lock
+            input(type="password", id="confirmPassword", name="confirmPassword", placeholder="Confirma tu contraseña", required)
+        
+        .form-group
+          label(for="profileImage") Imagen de perfil (opcional)
+          .file-input-group
+            input(type="file", id="profileImage", name="profileImage", accept="image/*")
+            .file-input-label
+              i.fas.fa-camera
+              span Seleccionar imagen
+        
+        .form-group
+          label(for="interests") Intereses y especialidades
+          .input-group.textarea-group
+            i.fas.fa-palette
+            textarea(id="interests", name="interests", placeholder="Describe tus intereses artísticos, técnicas que dominas, materiales favoritos, etc.", rows="4")
+        
+        .form-options
+          .checkbox-group
+            input(type="checkbox", id="terms", name="terms", required)
+            label(for="terms") Acepto los 
+              a(href="#") términos y condiciones
+        
+        button.auth-btn(type="submit") Crear Cuenta
+      
+      .auth-divider
+        span o
+      
+      .social-login
+        button.social-btn.google-btn
+          i.fab.fa-google
+          span Registrarse con Google
+        button.social-btn.facebook-btn
+          i.fab.fa-facebook-f
+          span Registrarse con Facebook
+      
+      .auth-footer
+        p ¿Ya tienes una cuenta? 
+          a(href="/login") Iniciar sesión
+
+block footer
+  // No footer en páginas de autenticación

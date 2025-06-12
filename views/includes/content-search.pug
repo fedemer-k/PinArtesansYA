@@ -1,0 +1,23 @@
+section.content-search-section
+  .content-search-container
+    form.content-search-form(action="/search" method="GET")
+      .content-search-bar
+        i.fas.fa-images
+        input(type="text", name="q", placeholder="Buscar imágenes y álbumes...", id="contentSearchInput")
+        button.search-button(type="submit")
+          i.fas.fa-search
+          span Buscar
+    
+    .content-search-results(id="contentSearchResults", style="display: none;")
+      .search-results-header
+        h3 Resultados de búsqueda de contenido
+        .results-count(id="contentResultsCount")
+      
+      .content-grid(id="contentGrid")
+        // Los resultados se cargarán dinámicamente aquí
+      
+      .no-content-results(id="noContentResults", style="display: none;")
+        .no-results-icon
+          i.fas.fa-image
+        h3 No se encontraron imágenes
+        p Intenta con otros términos de búsqueda

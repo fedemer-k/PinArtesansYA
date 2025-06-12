@@ -1,0 +1,100 @@
+extends layout
+
+block content
+  .image-view-container
+    .image-view-card
+      .image-header
+        .image-owner-info
+          .owner-avatar
+            if owner.imagen_perfil
+              img(src=owner.imagen_perfil, alt=owner.nombre)
+            else
+              img(src="/uploads/profiles/default.png", alt=owner.nombre)
+          .owner-details
+            h3.owner-name= owner.nombre
+            if owner.moderador
+              span.moderator-badge
+                i.fas.fa-shield-alt
+                | Moderador
+            p.album-info
+              i.fas.fa-folder
+              | Álbum: #{album.titulo}
+        
+        .image-actions
+          if user && user.id === owner.id_usuario
+            button.edit-image-btn(title="Editar imagen")
+              i.fas.fa-edit
+          button.share-image-btn(title="Compartir imagen")
+            i.fas.fa-share-alt
+      
+      .image-content
+        .image-container
+          img.main-image(src=image.ruta_imagen, alt=image.titulo || 'Imagen')
+        
+        .image-info
+          if image.titulo
+            h2.image-title= image.titulo
+          if image.descripcion
+            p.image-description= image.descripcion
+          
+          .image-meta
+            .meta-item
+              i.fas.fa-calendar
+              span.upload-date= new Date(image.fecha_subida).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+            .meta-item
+              i.fas.fa-comment
+              span.comments-count #{comments.length} comentario(s)
+            .meta-item
+              i.fas.fa-heart
+              span.likes-count 0 me gusta
+      
+      .comments-section
+        .comments-header
+          h3 Comentarios
+          .comments-count-badge= comments.length
+        
+        .comments-list(id="commentsList")
+          if comments && comments.length > 0
+            each comment in comments
+              .comment-item(data-comment-id=comment.id_comentario)
+                .comment-avatar
+                  img(src=comment.usuario_avatar, alt=comment.usuario_nombre)
+                .comment-content
+                  .comment-header
+                    span.comment-author= comment.usuario_nombre
+                    span.comment-date= new Date(comment.fecha).toLocaleDateString('es-ES')
+                    if user && (user.id === comment.id_usuario || user.moderador)
+                      button.delete-comment-btn(data-comment-id=comment.id_comentario, title="Eliminar comentario")
+                        i.fas.fa-trash
+                  p.comment-text= comment.texto
+          else
+            .no-comments
+              i.fas.fa-comment-slash
+              p Aún no hay comentarios en esta imagen
+              p ¡Sé el primero en comentar!
+        
+        if canComment
+          .comment-form-container
+            form.comment-form(id="commentForm")
+              .form-group
+                .comment-input-container
+                  .user-avatar-small
+                    if user.imagen_perfil
+                      img(src=user.imagen_perfil, alt=user.nombre)
+                    else
+                      img(src="/uploads/profiles/default.png", alt=user.nombre)
+                  textarea.comment-input(id="commentInput", placeholder="Escribe un comentario...", maxlength="500", rows="3")
+                  .character-count
+                    span.current-count 0
+                    span /500
+              .form-actions
+                button.cancel-comment-btn(type="button", style="display: none;") Cancelar
+                button.submit-comment-btn(type="submit", disabled) Comentar
+        else
+          .login-prompt
+            p
+              a(href="/login") Inicia sesión
+              |  para dejar un comentario
+
+block append scripts
+  script(src="/js/image-view.js")
