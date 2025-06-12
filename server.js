@@ -39,6 +39,7 @@ const imagesRoutes = require("./routes/images")
 const notificationsRoutes = require("./routes/notifications")
 const searchRoutes = require("./routes/search")
 const apiRoutes = require("./routes/api")
+const profileRoutes = require("./routes/profile")
 
 // Configurar motor de plantillas Pug
 app.set("view engine", "pug")
@@ -65,6 +66,7 @@ app.use("/image", imagesRoutes)
 app.use("/notifications", notificationsRoutes)
 app.use("/search", searchRoutes)
 app.use("/api", apiRoutes)
+app.use("/profile", profileRoutes)
 
 // Manejo de errores 404
 app.use((req, res, next) => {

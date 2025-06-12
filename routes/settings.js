@@ -4,7 +4,7 @@ const settingsController = require("../controllers/settingsController")
 const { requireAuth } = require("../middleware/auth")
 
 // Rutas de configuración (requieren autenticación)
-router.get("/settings", requireAuth, settingsController.getSettingsPage)
-router.post("/settings", requireAuth, settingsController.updateSettings)
+router.get("/", requireAuth, settingsController.getSettingsPage)
+router.post("/", requireAuth, settingsController.updateSettings)
 
 module.exports = router

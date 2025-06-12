@@ -32,7 +32,7 @@ const upload = multer({
 })
 
 // Rutas de subida (requieren autenticación)
-router.get("/upload", requireAuth, uploadController.getUploadPage)
-router.post("/upload", requireAuth, upload.single("image"), uploadController.processUpload)
+router.get("/", requireAuth, uploadController.getUploadPage)
+router.post("/", requireAuth, upload.single("image"), uploadController.processUpload)
 
 module.exports = router
