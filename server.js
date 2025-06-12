@@ -29,9 +29,15 @@ createDirectoryIfNotExists(uploadsDir)
 createDirectoryIfNotExists(profilesDir)
 createDirectoryIfNotExists(imagesDir)
 
-// Importar rutas
+// Importar rutas (manteniendo las existentes y agregando las nuevas)
 const indexRoutes = require("./routes/index")
 const authRoutes = require("./routes/auth")
+const settingsRoutes = require("./routes/settings")
+const uploadRoutes = require("./routes/upload")
+const albumsRoutes = require("./routes/albums")
+const imagesRoutes = require("./routes/images")
+const notificationsRoutes = require("./routes/notifications")
+const searchRoutes = require("./routes/search")
 const apiRoutes = require("./routes/api")
 
 // Configurar motor de plantillas Pug
@@ -47,9 +53,17 @@ app.use(cookieParser())
 // Middleware global para obtener usuario actual
 app.use(getCurrentUser)
 
-// Usar rutas
+// Usar rutas (manteniendo la estructura original para las principales)
 app.use("/", indexRoutes)
 app.use("/", authRoutes)
+
+// Rutas modulares con prefijos específicos
+app.use("/settings", settingsRoutes)
+app.use("/upload", uploadRoutes)
+app.use("/albums", albumsRoutes)
+app.use("/image", imagesRoutes)
+app.use("/notifications", notificationsRoutes)
+app.use("/search", searchRoutes)
 app.use("/api", apiRoutes)
 
 // Manejo de errores 404
