@@ -4,11 +4,13 @@ const Gallery = require("../models/gallery")
 // Obtener perfil de usuario
 exports.getProfile = async (req, res) => {
   try {
-    const username = req.params.username || (req.user ? req.user.username : null)
-
-    if (!username) {
-      return res.redirect("/login")
+    // Verificar si hay un usuario autenticado
+    if (!req.user) {
+      return res.redirect("/login?redirect=/profile")
     }
+
+    // Obtener el nombre de usuario del parámetro o del usuario actual
+    const username = req.params.username || req.user.nombre
 
     // Obtener datos del usuario
     const profileUser = await User.findByUsername(username)
@@ -22,25 +24,51 @@ exports.getProfile = async (req, res) => {
 
     // Verificar si el usuario actual sigue al usuario del perfil
     let isFollowing = false
-    if (req.user && req.user.id !== profileUser.id) {
-      isFollowing = await User.isFollowing(req.user.id, profileUser.id)
+    if (req.user.id_usuario !== profileUser.id_usuario) {
+      // Asegurarse de que ambos IDs sean números válidos
+      const currentUserId = Number.parseInt(req.user.id_usuario, 10)
+      const profileUserId = Number.parseInt(profileUser.id_usuario, 10)
+
+      if (!isNaN(currentUserId) && !isNaN(profileUserId)) {
+        isFollowing = await User.isFollowing(currentUserId, profileUserId)
+      }
     }
 
-    // Obtener imágenes del usuario
-    const images = await Gallery.getImagesByUser(profileUser.id)
+    // Obtener imágenes del usuario (con manejo de errores)
+    let images = []
+    try {
+      if (typeof Gallery.getImagesByUser === "function") {
+        images = (await Gallery.getImagesByUser(profileUser.id_usuario)) || []
+      }
+    } catch (error) {
+      console.error("Error al obtener imágenes:", error)
+    }
 
-    // Obtener álbumes del usuario
-    const albums = await Gallery.getAlbumsByUser(profileUser.id)
+    // Obtener álbumes del usuario (con manejo de errores)
+    let albums = []
+    try {
+      if (typeof Gallery.getAlbumsByUser === "function") {
+        albums = (await Gallery.getAlbumsByUser(profileUser.id_usuario)) || []
+      }
+    } catch (error) {
+      console.error("Error al obtener álbumes:", error)
+    }
 
-    // Contar seguidores
-    const followerCount = await User.countFollowers(profileUser.id)
+    // Contar seguidores (con manejo de errores)
+    let followerCount = 0
+    try {
+      followerCount = await User.countFollowers(profileUser.id_usuario)
+    } catch (error) {
+      console.error("Error al contar seguidores:", error)
+    }
 
     // Contar imágenes y álbumes
     const imageCount = images.length
     const albumCount = albums.length
 
+    // Renderizar la vista
     res.render("profile", {
-      title: `${profileUser.username} - PinArtesans`,
+      title: `${profileUser.nombre} - PinArtesans`,
       user: req.user,
       profileUser,
       images,
@@ -63,8 +91,8 @@ exports.getProfile = async (req, res) => {
 // Obtener perfil propio
 exports.getOwnProfile = async (req, res) => {
   if (!req.user) {
-    return res.redirect("/login")
+    return res.redirect("/login?redirect=/profile")
   }
 
-  res.redirect(`/profile/${req.user.username}`)
+  res.redirect(`/profile/${req.user.nombre}`)
 }

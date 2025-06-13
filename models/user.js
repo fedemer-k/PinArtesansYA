@@ -13,6 +13,10 @@ class User {
     this.modo_vitrina = data.modo_vitrina
     this.moderador = data.moderador
     this.cuenta_suspendida = data.cuenta_suspendida
+
+    // Alias para compatibilidad con el controlador de perfil
+    this.id = data.id_usuario
+    this.username = data.nombre
   }
 
   static async findByEmail(email) {
@@ -32,6 +36,55 @@ class User {
     } catch (error) {
       console.error("Error al buscar usuario por ID:", error)
       throw error
+    }
+  }
+
+  // Nuevo método para buscar por nombre de usuario
+  static async findByUsername(username) {
+    try {
+      const results = await query("SELECT * FROM Usuario WHERE nombre = ?", [username])
+      return results.length > 0 ? new User(results[0]) : null
+    } catch (error) {
+      console.error("Error al buscar usuario por nombre:", error)
+      throw error
+    }
+  }
+
+  // Método para verificar si un usuario sigue a otro
+  static async isFollowing(followerId, followedId) {
+    try {
+      // Verificar que ambos IDs sean válidos
+      if (!followerId || !followedId) {
+        return false
+      }
+
+      const results = await query(
+        "SELECT * FROM Seguimiento WHERE id_usuario = ? AND id_usuarioseguido = ? AND id_estadosolicitud = 1",
+        [followerId, followedId],
+      )
+      return results.length > 0
+    } catch (error) {
+      console.error("Error al verificar seguimiento:", error)
+      return false // En caso de error, asumimos que no sigue
+    }
+  }
+
+  // Método para contar seguidores
+  static async countFollowers(userId) {
+    try {
+      // Verificar que el ID sea válido
+      if (!userId) {
+        return 0
+      }
+
+      const results = await query(
+        "SELECT COUNT(*) as count FROM Seguimiento WHERE id_usuarioseguido = ? AND id_estadosolicitud = 1",
+        [userId],
+      )
+      return results[0].count
+    } catch (error) {
+      console.error("Error al contar seguidores:", error)
+      return 0 // En caso de error, devolvemos 0
     }
   }
 

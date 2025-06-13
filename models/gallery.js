@@ -631,8 +631,52 @@ class Comment {
   }
 }
 
+class Gallery {
+  // Método para obtener imágenes de un usuario
+  static async getImagesByUser(userId) {
+    try {
+      if (!userId) return []
+
+      const sql = `
+        SELECT i.*, u.nombre as nombre_usuario, u.imagen_perfil as imagen_usuario
+        FROM Imagen i
+        JOIN Usuario u ON i.id_usuario = u.id_usuario
+        WHERE i.id_usuario = ?
+        ORDER BY i.fecha_publicacion DESC
+      `
+
+      return await query(sql, [userId])
+    } catch (error) {
+      console.error("Error al obtener imágenes del usuario:", error)
+      return []
+    }
+  }
+
+  // Método para obtener álbumes de un usuario
+  static async getAlbumsByUser(userId) {
+    try {
+      if (!userId) return []
+
+      const sql = `
+        SELECT a.*, COUNT(i.id_imagen) as total_imagenes
+        FROM Album a
+        LEFT JOIN Imagen i ON a.id_album = i.id_album
+        WHERE a.id_usuario = ?
+        GROUP BY a.id_album
+        ORDER BY a.fecha_creacion DESC
+      `
+
+      return await query(sql, [userId])
+    } catch (error) {
+      console.error("Error al obtener álbumes del usuario:", error)
+      return []
+    }
+  }
+}
+
 module.exports = {
   Image,
   Album,
   Comment,
+  Gallery,
 }
