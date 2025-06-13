@@ -1,0 +1,78 @@
+extends layout
+
+block content
+  .container.py-4
+    .row
+      .col-md-4
+        .card.mb-4
+          .card-body.text-center
+            if user.profileImage
+              img.rounded-circle.img-fluid.mb-3(src=`/uploads/profiles/${user.profileImage}` alt=`${user.username} profile image` style="width: 150px; height: 150px; object-fit: cover;")
+            else
+              img.rounded-circle.img-fluid.mb-3(src="/placeholder-user.jpg" alt="Default profile image" style="width: 150px; height: 150px; object-fit: cover;")
+            
+            h3.card-title= profileUser.username
+            
+            if profileUser.bio
+              p.card-text= profileUser.bio
+            else
+              p.card-text.text-muted Sin biografía
+            
+            if user && user.id !== profileUser.id
+              if isFollowing
+                button.btn.btn-outline-primary.unfollow-btn(data-user-id=profileUser.id) Dejar de seguir
+              else
+                button.btn.btn-primary.follow-btn(data-user-id=profileUser.id) Seguir
+            
+            .d-flex.justify-content-around.mt-4
+              .text-center
+                h5= imageCount || 0
+                p.text-muted Imágenes
+              .text-center
+                h5= albumCount || 0
+                p.text-muted Álbumes
+              .text-center
+                h5= followerCount || 0
+                p.text-muted Seguidores
+      
+      .col-md-8
+        ul.nav.nav-tabs.mb-4#profileTabs(role="tablist")
+          li.nav-item(role="presentation")
+            button.nav-link.active#images-tab(data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab" aria-controls="images" aria-selected="true") Imágenes
+          li.nav-item(role="presentation")
+            button.nav-link#albums-tab(data-bs-toggle="tab" data-bs-target="#albums" type="button" role="tab" aria-controls="albums" aria-selected="false") Álbumes
+        
+        .tab-content
+          .tab-pane.fade.show.active#images(role="tabpanel" aria-labelledby="images-tab")
+            if images && images.length > 0
+              .row
+                each image in images
+                  .col-md-4.mb-4
+                    .card.h-100
+                      a(href=`/image/${image.id}`)
+                        img.card-img-top(src=`/uploads/images/${image.filename}` alt=image.title style="height: 200px; object-fit: cover;")
+                      .card-body
+                        h5.card-title.text-truncate= image.title
+                        p.card-text.text-muted.small= new Date(image.created_at).toLocaleDateString()
+            else
+              .alert.alert-info No hay imágenes para mostrar
+          
+          .tab-pane.fade#albums(role="tabpanel" aria-labelledby="albums-tab")
+            if albums && albums.length > 0
+              .row
+                each album in albums
+                  .col-md-4.mb-4
+                    .card.h-100
+                      a(href=`/albums/${album.id}`)
+                        if album.cover_image
+                          img.card-img-top(src=`/uploads/images/${album.cover_image}` alt=album.name style="height: 200px; object-fit: cover;")
+                        else
+                          img.card-img-top(src="/placeholder.jpg" alt="Album sin portada" style="height: 200px; object-fit: cover;")
+                      .card-body
+                        h5.card-title.text-truncate= album.name
+                        p.card-text.text-muted.small= `${album.image_count || 0} imágenes`
+            else
+              .alert.alert-info No hay álbumes para mostrar
+
+block scripts
+  script(src="/js/profile.js")

@@ -3,6 +3,7 @@ const router = express.Router()
 const multer = require("multer")
 const path = require("path")
 const { requireAuth } = require("../middleware/auth")
+const profileController = require("../controllers/profileController")
 
 // Configuración de Multer para fotos de perfil
 const storage = multer.diskStorage({
@@ -31,21 +32,10 @@ const upload = multer({
 })
 
 // Rutas de perfil
-router.get("/", requireAuth, (req, res) => {
-  // Mostrar perfil del usuario actual
-  res.render("profile", {
-    title: "Mi Perfil - PinArtesans",
-    user: req.user,
-  })
-})
+router.get("/", requireAuth, profileController.getOwnProfile)
 
-router.get("/:username", (req, res) => {
-  // Mostrar perfil de otro usuario
-  res.render("profile", {
-    title: `Perfil de ${req.params.username} - PinArtesans`,
-    profileUser: req.params.username,
-  })
-})
+// Ruta para ver el perfil de un usuario específico
+router.get("/:username", profileController.getProfile)
 
 router.post("/avatar", requireAuth, upload.single("avatar"), (req, res) => {
   // Actualizar foto de perfil

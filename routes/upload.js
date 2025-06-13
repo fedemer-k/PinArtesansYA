@@ -35,4 +35,7 @@ const upload = multer({
 router.get("/", requireAuth, uploadController.getUploadPage)
 router.post("/", requireAuth, upload.single("image"), uploadController.processUpload)
 
+// Eliminamos la ruta que causa el error ya que el método no existe
+// router.post("/album", requireAuth, upload.single("image"), uploadController.uploadToAlbum)
+
 module.exports = router
