@@ -199,11 +199,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Crear grid de usuarios
     if (usersGrid) {
       usersGrid.innerHTML = users.map((user) => createUserCard(user)).join("")
-
-      // Agregar event listeners a los botones de seguir
-      usersGrid.querySelectorAll(".follow-btn").forEach((btn) => {
-        btn.addEventListener("click", handleFollowClick)
-      })
     }
   }
 
@@ -225,24 +220,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Crear tarjeta de usuario
   function createUserCard(user) {
-    let buttonContent = ""
-    let buttonClass = "follow-btn"
+    const buttonContent = ""
+    const buttonClass = "follow-btn"
+    let buttonHtml = ""
 
     switch (user.follow_status) {
       case "following":
-        buttonContent = '<i class="fas fa-check"></i> Siguiendo'
-        buttonClass += " following"
+        buttonHtml = `<form action="/profile/${user.id}/unfollow" method="POST">
+                        <button type="submit" class="follow-btn following">
+                          <i class="fas fa-check"></i> Siguiendo
+                        </button>
+                      </form>`
         break
       case "pending_sent":
-        buttonContent = '<i class="fas fa-clock"></i> Pendiente'
-        buttonClass += " pending"
+        buttonHtml = `<button class="follow-btn pending" disabled>
+                        <i class="fas fa-clock"></i> Pendiente
+                      </button>`
         break
       case "pending_received":
-        buttonContent = '<i class="fas fa-user-plus"></i> Responder'
-        buttonClass += " respond"
+        buttonHtml = `<a href="/notifications" class="follow-btn respond">
+                        <i class="fas fa-user-plus"></i> Responder
+                      </a>`
         break
       default:
-        buttonContent = '<i class="fas fa-user-plus"></i> Seguir'
+        buttonHtml = `<form action="/profile/${user.id}/follow" method="POST">
+                        <button type="submit" class="follow-btn">
+                          <i class="fas fa-user-plus"></i> Seguir
+                        </button>
+                      </form>`
     }
 
     return `
@@ -256,52 +261,9 @@ document.addEventListener("DOMContentLoaded", () => {
           ${user.intereses ? `<p class="user-interests">${user.intereses.substring(0, 100)}${user.intereses.length > 100 ? "..." : ""}</p>` : ""}
           ${user.modo_vitrina ? '<span class="showcase-badge"><i class="fas fa-star"></i> Vitrina</span>' : ""}
         </div>
-        <button class="${buttonClass}" data-user-id="${user.id}" data-action="${user.follow_status}">
-          ${buttonContent}
-        </button>
+        ${buttonHtml}
       </div>
     `
-  }
-
-  // Manejar click en botón de seguir
-  async function handleFollowClick(e) {
-    const button = e.currentTarget
-    const userId = button.dataset.userId
-    const action = button.dataset.action
-
-    try {
-      let response
-      if (action === "pending_received") {
-        // Redirigir a notificaciones para responder
-        window.location.href = "/notifications"
-        return
-      } else {
-        // Enviar solicitud de seguimiento
-        response = await fetch(`/api/follow/${userId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-      }
-
-      const result = await response.json()
-
-      if (result.success) {
-        // Actualizar botón
-        button.innerHTML = '<i class="fas fa-clock"></i> Pendiente'
-        button.className = "follow-btn pending"
-        button.dataset.action = "pending_sent"
-
-        // Actualizar contador de notificaciones
-        loadNotificationCount()
-      } else {
-        alert(result.message || "Error al enviar solicitud")
-      }
-    } catch (error) {
-      console.error("Error al enviar solicitud de seguimiento:", error)
-      alert("Error al enviar solicitud")
-    }
   }
 
   // Función para cargar más imágenes
@@ -358,7 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="gallery-overlay">
                 <div class="overlay-stats">
                     <div class="stat-item">
-                        <i class="fas fa-heart"></i>
+                        <i class="fas.fa-heart"></i>
                         <span class="likes-count">${image.likes || 0}</span>
                     </div>
                     <div class="stat-item">

@@ -1,43 +1,82 @@
 const express = require("express")
 const router = express.Router()
-const multer = require("multer")
-const path = require("path")
 const { requireAuth } = require("../middleware/auth")
+const { upload, handleMulterError } = require("../config/multer")
 const profileController = require("../controllers/profileController")
-
-// Configuración de Multer para fotos de perfil
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, "..", "public", "uploads", "profiles")
-    cb(null, uploadPath)
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
-    cb(null, "profile-" + uniqueSuffix + path.extname(file.originalname))
-  },
-})
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: Number.parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024,
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true)
-    } else {
-      cb(new Error("Solo se permiten archivos de imagen"), false)
-    }
-  },
-})
+const { Seguimiento } = require("../models/social")
+const { Notificacion } = require("../models/social")
+const User = require("../models/user")
 
 // Rutas de perfil
 router.get("/", requireAuth, profileController.getOwnProfile)
 
 // Ruta para ver el perfil de un usuario específico
-router.get("/:username", profileController.getProfile)
+router.get("/:username", requireAuth, profileController.getProfile)
 
-router.post("/avatar", requireAuth, upload.single("avatar"), (req, res) => {
+// Ruta para seguir a un usuario
+router.post("/:userId/follow", requireAuth, async (req, res) => {
+  try {
+    const targetUserId = req.params.userId
+    const currentUserId = req.user.id
+
+    if (currentUserId == targetUserId) {
+      return res.status(400).send("No puedes seguirte a ti mismo")
+    }
+
+    // Verificar si ya existe una solicitud o seguimiento
+    const existingFollow = await Seguimiento.findByUsers(currentUserId, targetUserId)
+    if (existingFollow) {
+      return res.status(400).send("Ya existe una solicitud o seguimiento")
+    }
+
+    // Crear solicitud de seguimiento
+    const followRequest = await Seguimiento.create({
+      id_usuario: currentUserId,
+      id_usuarioseguido: targetUserId,
+      id_estadosolicitud: 3, // Pendiente
+    })
+
+    // Crear notificación
+    const currentUser = await User.findById(currentUserId)
+    await Notificacion.create({
+      mensaje: `${currentUser.nombre} te ha enviado una solicitud de seguimiento`,
+      id_usuario: targetUserId,
+      id_tiponotificacion: 1, // Seguimiento
+    })
+
+    // Redirigir de vuelta al perfil
+    res.redirect(`/profile/${req.query.redirect || targetUserId}`)
+  } catch (error) {
+    console.error("Error al enviar solicitud de seguimiento:", error)
+    res.status(500).send("Error al enviar solicitud")
+  }
+})
+
+// Ruta para dejar de seguir a un usuario
+router.post("/:userId/unfollow", requireAuth, async (req, res) => {
+  try {
+    const targetUserId = req.params.userId
+    const currentUserId = req.user.id
+
+    // Buscar la relación de seguimiento
+    const followRelation = await Seguimiento.findByUsers(currentUserId, targetUserId)
+    if (!followRelation) {
+      return res.status(404).send("No sigues a este usuario")
+    }
+
+    // Eliminar la relación de seguimiento
+    await Seguimiento.delete(followRelation.id_amistad)
+
+    // Redirigir de vuelta al perfil
+    res.redirect(`/profile/${req.query.redirect || targetUserId}`)
+  } catch (error) {
+    console.error("Error al dejar de seguir:", error)
+    res.status(500).send("Error al procesar la solicitud")
+  }
+})
+
+// Ruta para actualizar avatar usando la configuración centralizada de multer
+router.post("/avatar", requireAuth, upload.single("avatar"), handleMulterError, (req, res) => {
   // Actualizar foto de perfil
   if (!req.file) {
     return res.status(400).json({ success: false, message: "No se subió ningún archivo" })

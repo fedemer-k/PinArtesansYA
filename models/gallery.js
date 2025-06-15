@@ -249,6 +249,12 @@ class Image {
 
   static async canUserView(imageId, userId) {
     try {
+      // Verificar que imageId sea válido
+      if (!imageId) {
+        console.error("canUserView: imageId es undefined o null")
+        return false
+      }
+
       const results = await query(
         `
         SELECT i.privacidad, a.id_usuario as owner_id, u.modo_vitrina
@@ -260,12 +266,15 @@ class Image {
         [imageId],
       )
 
-      if (results.length === 0) return false
+      if (results.length === 0) {
+        console.error(`canUserView: Imagen con ID ${imageId} no encontrada`)
+        return false
+      }
 
       const image = results[0]
 
       // Si es el propietario, siempre puede ver
-      if (userId && image.owner_id === userId) return true
+      if (userId && image.owner_id == userId) return true
 
       // Imagen privada (0) - solo el propietario
       if (image.privacidad === 0) return false
@@ -299,7 +308,7 @@ class Image {
 
       return false
     } catch (error) {
-      console.error("Error al verificar permisos de imagen:", error)
+      console.error(`Error al verificar permisos de imagen ${imageId} para usuario ${userId}:`, error)
       return false
     }
   }

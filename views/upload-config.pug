@@ -1,0 +1,103 @@
+extends layout
+
+block append styles
+  link(rel="stylesheet", href="/css/upload.css")
+
+block content
+  .upload-container
+    .upload-card
+      .upload-progress
+        .progress-step.completed
+          i.fas.fa-check
+          span Paso 1: Selección
+        .progress-arrow →
+        .progress-step.active
+          i.fas.fa-cog
+          span Paso 2: Configuración
+      
+      .upload-header
+        h2 Subir Imágenes - Paso 2
+        p Configura cada imagen antes de subirla
+      
+      if error
+        .error-message
+          i.fas.fa-exclamation-circle
+          span= error
+      
+      form.upload-config-form(action="/upload/process", method="POST")
+        input(type="hidden", name="albumId", value=albumId)
+        input(type="hidden", name="newAlbumName", value=newAlbumName)
+        
+        .images-config-section
+          each image, index in images
+            .image-config-item
+              .image-preview
+                img(src=image.tempPath, alt=`Imagen ${index + 1}`)
+              
+              .image-settings
+                h4= `Imagen ${index + 1}`
+                
+                .form-group
+                  label(for=`title_${index}`) Título:
+                  input(type="text", name=`images[${index}][title]`, id=`title_${index}`, placeholder="Título opcional")
+                
+                .form-group
+                  label(for=`description_${index}`) Descripción:
+                  textarea(name=`images[${index}][description]`, id=`description_${index}`, placeholder="Descripción opcional", rows="2")
+                
+                .form-group
+                  label(for=`privacy_${index}`) Nivel de privacidad:
+                  select(name=`images[${index}][privacy]`, id=`privacy_${index}`)
+                    option(value="0") Privada (solo yo)
+                    option(value="1", selected) Seguidores
+                    option(value="2") Pública (modo vitrina)
+                    option(value="3") Usuario específico
+                
+                .shared-users-section(id=`sharedUsers_${index}`, style="display: none;")
+                  label Compartir con:
+                  .followers-list
+                    each follower in followers
+                      .follower-item
+                        input(type="checkbox", name=`images[${index}][sharedUsers]`, value=follower.id_usuario, id=`follower_${index}_${follower.id_usuario}`)
+                        label(for=`follower_${index}_${follower.id_usuario}`)
+                          if follower.imagen_perfil
+                            img(src=follower.imagen_perfil, alt=follower.nombre)
+                          else
+                            img(src="/uploads/profiles/default.png", alt=follower.nombre)
+                          span= follower.nombre
+                
+                input(type="hidden", name=`images[${index}][filename]`, value=image.filename)
+        
+        .form-actions
+          button.upload-btn(type="submit")
+            i.fas.fa-upload
+            | Finalizar Subida
+          a.cancel-btn(href="/upload")
+            i.fas.fa-arrow-left
+            | Volver
+
+block append scripts
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      // Script para mostrar/ocultar sección de usuarios compartidos
+      document.querySelectorAll('select[name*="[privacy]"]').forEach(select => {
+        select.addEventListener('change', function() {
+          const index = this.name.match(/\[(\d+)\]/)[1];
+          const sharedUsersSection = document.getElementById(`sharedUsers_${index}`);
+          
+          if (this.value === '3') {
+            sharedUsersSection.style.display = 'block';
+          } else {
+            sharedUsersSection.style.display = 'none';
+          }
+        });
+      });
+      
+      // Validación del formulario
+      const form = document.querySelector('.upload-config-form');
+      form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('.upload-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+      });
+    });

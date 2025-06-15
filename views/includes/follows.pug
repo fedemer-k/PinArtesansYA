@@ -3,12 +3,13 @@ section.follows-section
     .follows-container
       each follow in follows
         .follow-item
-          .follow-avatar
-            if follow.imagen_perfil
-              img(src=follow.imagen_perfil, alt=follow.nombre)
-            else
-              img(src="/uploads/profiles/default.png", alt=follow.nombre)
-          span.follow-username= follow.nombre
+          a(href=`/profile/${follow.nombre}`)
+            .follow-avatar
+              if follow.imagen_perfil
+                img(src=follow.imagen_perfil, alt=follow.nombre)
+              else
+                img(src="/uploads/profiles/default.png", alt=follow.nombre)
+            span.follow-username= follow.nombre
   else
     .no-follows
       p No sigues a ningún usuario aún

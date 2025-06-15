@@ -1,95 +1,147 @@
 extends layout
 
+block append styles
+  link(rel="stylesheet", href="/css/upload.css")
+
 block content
   .upload-container
     .upload-card
+      .upload-progress
+        .progress-step.active
+          i.fas.fa-folder
+          span Paso 1: Selección
+        .progress-arrow →
+        .progress-step.inactive
+          i.fas.fa-cog
+          span Paso 2: Configuración
+      
       .upload-header
-        h2 Subir Imágenes
-        p Comparte tus creaciones artesanales con la comunidad
+        h2 Subir Imágenes - Paso 1
+        p Selecciona el álbum y las imágenes que deseas subir
       
       if error
         .error-message
           i.fas.fa-exclamation-circle
           span= error
       
-      form.upload-form(id="uploadForm", enctype="multipart/form-data")
+      form.upload-form(action="/upload/config", method="POST", enctype="multipart/form-data", id="uploadForm")
         .form-section
-          h3 Seleccionar Álbum
+          h3
+            i.fas.fa-folder
+            | Seleccionar Álbum
           
           .album-selector
-            select(id="albumSelect", name="albumId")
+            select(name="albumId", id="albumSelect")
               option(value="") Seleccionar álbum existente...
               each album in albums
                 option(value=album.id_album)= album.titulo
           
-          .new-album-section(id="newAlbumSection")
+          .new-album-section
             .form-group
               label(for="newAlbumName") O crear nuevo álbum:
               .input-group
                 i.fas.fa-folder-plus
-                input(type="text", id="newAlbumName", name="newAlbumName", placeholder="Nombre del nuevo álbum")
+                input(type="text", name="newAlbumName", id="newAlbumName", placeholder="Nombre del nuevo álbum")
         
         .form-section
-          h3 Seleccionar Imágenes
+          h3
+            i.fas.fa-images
+            | Seleccionar Imágenes
           
-          .file-upload-area(id="fileUploadArea")
-            input(type="file", id="imageFiles", name="images", multiple, accept="image/*", style="display: none;")
+          .file-upload-area
+            input(type="file", name="images", multiple, accept="image/*", required, id="imageFiles")
             .upload-placeholder
               i.fas.fa-cloud-upload-alt
-              h4 Arrastra imágenes aquí o haz click para seleccionar
-              p Máximo 10 imágenes, 10MB cada una
-        
-        .images-preview(id="imagesPreview")
-          // Las previsualizaciones aparecerán aquí
+              h4 Selecciona las imágenes
+              p Máximo 10 imágenes, 5MB cada una
         
         .form-actions
-          button.upload-btn(type="submit", disabled) Subir Imágenes
-          a.cancel-btn(href="/") Cancelar
-
-  // Modal para configurar privacidad de imagen específica
-  .modal(id="privacyModal")
-    .modal-content
-      .modal-header
-        h3 Configurar Privacidad
-        button.modal-close(id="closePrivacyModal")
-          i.fas.fa-times
-      
-      .modal-body
-        .image-preview-modal(id="modalImagePreview")
-        
-        .privacy-form
-          .form-group
-            label(for="imageTitle") Título de la imagen:
-            input(type="text", id="imageTitle", placeholder="Título opcional")
-          
-          .form-group
-            label(for="imageDescription") Descripción:
-            textarea(id="imageDescription", placeholder="Descripción opcional", rows="3")
-          
-          .form-group
-            label(for="privacyLevel") Nivel de privacidad:
-            select(id="privacyLevel")
-              option(value="0") Privada (solo yo)
-              option(value="1", selected) Seguidores
-              option(value="2") Pública (modo vitrina)
-              option(value="3") Usuario específico
-          
-          .shared-users-section(id="sharedUsersSection", style="display: none;")
-            label Compartir con:
-            .followers-list(id="followersList")
-              each follower in followers
-                .follower-item
-                  input(type="checkbox", id=`follower_${follower.id_usuario}`, value=follower.id_usuario)
-                  label(for=`follower_${follower.id_usuario}`)
-                    if follower.imagen_perfil
-                      img(src=follower.imagen_perfil, alt=follower.nombre)
-                    else
-                      img(src="/uploads/profiles/default.png", alt=follower.nombre)
-                    span= follower.nombre
-      
-      .modal-footer
-        button.save-privacy-btn(id="savePrivacyBtn") Guardar
-        button.cancel-privacy-btn(id="cancelPrivacyBtn") Cancelar
+          button.upload-btn(type="submit")
+            | Continuar
+            i.fas.fa-arrow-right
+          a.cancel-btn(href="/")
+            i.fas.fa-times
+            | Cancelar
 
 block append scripts
-  script(src="/js/upload.js")
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('uploadForm');
+      const albumSelect = document.getElementById('albumSelect');
+      const newAlbumName = document.getElementById('newAlbumName');
+      const imageFiles = document.getElementById('imageFiles');
+      
+      // Mostrar archivos seleccionados
+      imageFiles.addEventListener('change', function(e) {
+        const files = e.target.files;
+        const placeholder = document.querySelector('.upload-placeholder h4');
+        if (files.length > 0) {
+          placeholder.textContent = `${files.length} imagen(es) seleccionada(s)`;
+          placeholder.style.color = '#d97706';
+        } else {
+          placeholder.textContent = 'Selecciona las imágenes';
+          placeholder.style.color = '';
+        }
+      });
+      
+      // Validación del formulario
+      form.addEventListener('submit', function(e) {
+        const albumId = albumSelect.value.trim();
+        const newAlbum = newAlbumName.value.trim();
+        const files = imageFiles.files;
+        
+        // Validar que se haya seleccionado un álbum o ingresado un nombre
+        if (!albumId && !newAlbum) {
+          e.preventDefault();
+          alert('Por favor, selecciona un álbum existente o ingresa el nombre para un nuevo álbum.');
+          return false;
+        }
+        
+        // Validar que se hayan seleccionado imágenes
+        if (files.length === 0) {
+          e.preventDefault();
+          alert('Por favor, selecciona al menos una imagen.');
+          return false;
+        }
+        
+        // Validar número máximo de imágenes
+        if (files.length > 10) {
+          e.preventDefault();
+          alert('Máximo 10 imágenes permitidas.');
+          return false;
+        }
+        
+        // Validar tamaño de archivos
+        for (let i = 0; i < files.length; i++) {
+          if (files[i].size > 5 * 1024 * 1024) { // 5MB
+            e.preventDefault();
+            alert(`La imagen "${files[i].name}" es demasiado grande. Máximo 5MB por imagen.`);
+            return false;
+          }
+        }
+        
+        // Mostrar estado de carga
+        const submitBtn = form.querySelector('.upload-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+      });
+      
+      // Lógica para alternar entre álbum existente y nuevo
+      albumSelect.addEventListener('change', function() {
+        if (this.value) {
+          newAlbumName.value = '';
+          newAlbumName.disabled = true;
+        } else {
+          newAlbumName.disabled = false;
+        }
+      });
+      
+      newAlbumName.addEventListener('input', function() {
+        if (this.value.trim()) {
+          albumSelect.value = '';
+          albumSelect.disabled = true;
+        } else {
+          albumSelect.disabled = false;
+        }
+      });
+    });

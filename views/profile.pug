@@ -1,79 +1,83 @@
 extends layout
 
-block content
-  .container.my-5
-    .row
-      .col-md-4
-        .card.mb-4
-          .card-body.text-center
-            if profileUser.imagen_perfil
-              img.rounded-circle.img-fluid.mb-3(src=profileUser.imagen_perfil, alt=profileUser.nombre, style="width: 150px; height: 150px; object-fit: cover;")
-            else
-              img.rounded-circle.img-fluid.mb-3(src="/placeholder-user.jpg", alt=profileUser.nombre, style="width: 150px; height: 150px; object-fit: cover;")
-            
-            h3.card-title= profileUser.nombre
-            p.text-muted= profileUser.email
-            
-            if profileUser.intereses
-              p.card-text= profileUser.intereses
-            
-            .d-flex.justify-content-center.mb-3
-              .px-3
-                h5= imageCount
-                p.text-muted Imágenes
-              .px-3
-                h5= albumCount
-                p.text-muted Álbumes
-              .px-3
-                h5= followerCount
-                p.text-muted Seguidores
-            
-            if user && user.id_usuario !== profileUser.id_usuario
-              if isFollowing
-                button.btn.btn-outline-primary.btn-block.unfollow-btn(data-user-id=profileUser.id_usuario) Dejar de seguir
-              else
-                button.btn.btn-primary.btn-block.follow-btn(data-user-id=profileUser.id_usuario) Seguir
-            
-            if user && user.id_usuario === profileUser.id_usuario
-              a.btn.btn-outline-secondary.btn-block.mt-2(href="/settings") Editar perfil
-    
-    .row.mt-4
-      .col-12
-        ul.nav.nav-tabs.mb-4#profileTabs
-          li.nav-item
-            a.nav-link.active#images-tab(data-toggle="tab", href="#images") Imágenes
-          li.nav-item
-            a.nav-link#albums-tab(data-toggle="tab", href="#albums") Álbumes
-        
-        .tab-content
-          .tab-pane.fade.show.active#images
-            .row
-              if images && images.length > 0
-                each image in images
-                  .col-md-4.col-sm-6.mb-4
-                    .card.h-100
-                      a(href=`/image/${image.id}`)
-                        img.card-img-top(src=image.filename, alt=image.title)
-                      .card-body
-                        h5.card-title= image.title || 'Sin título'
-              else
-                .col-12.text-center.py-5
-                  p.text-muted No hay imágenes para mostrar
-          
-          .tab-pane.fade#albums
-            .row
-              if albums && albums.length > 0
-                each album in albums
-                  .col-md-4.col-sm-6.mb-4
-                    .card.h-100
-                      a(href=`/albums/${album.id}`)
-                        img.card-img-top(src=album.coverImage, alt=album.name)
-                      .card-body
-                        h5.card-title= album.name
-                        p.card-text.text-muted #{album.imageCount} imágenes
-              else
-                .col-12.text-center.py-5
-                  p.text-muted No hay álbumes para mostrar
+block append styles
+  link(rel="stylesheet", href="/css/profile.css")
 
-block scripts
-  script(src="/js/profile.js")
+block content
+  .profile-container
+    .profile-card
+      .profile-header
+        .profile-cover
+        .profile-avatar
+          if profileUser.imagen_perfil
+            img(src=profileUser.imagen_perfil, alt=profileUser.nombre)
+          else
+            img(src="/uploads/profiles/default.png", alt=profileUser.nombre)
+        
+        .profile-info
+          h1.profile-name= profileUser.nombre
+          if profileUser.email
+            p.profile-username= profileUser.email
+          
+          if profileUser.intereses
+            p.profile-bio= profileUser.intereses
+          
+          .profile-stats
+            .stat-item
+              .stat-value= imageCount || 0
+              .stat-label Imágenes
+            .stat-item
+              .stat-value= albumCount || 0
+              .stat-label Álbumes
+            .stat-item
+              .stat-value= followerCount || 0
+              .stat-label Seguidores
+          
+          .profile-actions
+            if user && user.id !== profileUser.id_usuario
+              if followStatus === 'following'
+                form(action=`/profile/${profileUser.id_usuario}/unfollow`, method="POST")
+                  button.unfollow-btn(type="submit")
+                    i.fas.fa-user-minus.mr-2
+                    | Dejar de seguir
+              else if followStatus === 'pending'
+                button.pending-btn(type="button", disabled)
+                  i.fas.fa-clock.mr-2
+                  | Solicitud pendiente
+              else
+                form(action=`/profile/${profileUser.id_usuario}/follow`, method="POST")
+                  button.follow-btn(type="submit")
+                    i.fas.fa-user-plus.mr-2
+                    | Seguir
+            
+            if user && user.id === profileUser.id_usuario
+              a.edit-profile-btn(href="/settings")
+                i.fas.fa-cog.mr-2
+                | Editar perfil
+    
+    .profile-tabs
+      .tab-list
+        button.tab-button.active(data-tab="albums")
+          i.fas.fa-folder.mr-2
+          | Álbumes
+    
+    .tab-content
+      .tab-pane.active#albums
+        if albums && albums.length > 0
+          .profile-albums
+            each album in albums
+              .album-card
+                a(href=`/albums/${album.id_album}`)
+                  .album-cover
+                    img(src=album.cover_image || '/uploads/profiles/default.png', alt=album.titulo)
+                  .album-info
+                    h3.album-title= album.titulo
+                    .album-meta
+                      i.fas.fa-image
+                      span #{album.image_count || 0} imágenes
+        else
+          .empty-state
+            .empty-state-icon
+              i.fas.fa-folder-open
+            h3.empty-state-title No hay álbumes para mostrar
+            p.empty-state-text Este usuario aún no ha creado ningún álbum.

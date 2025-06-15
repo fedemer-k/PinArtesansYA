@@ -58,6 +58,16 @@ class Seguimiento {
     }
   }
 
+  static async delete(id) {
+    try {
+      await query("DELETE FROM Seguimiento WHERE id_amistad = ?", [id])
+      return true
+    } catch (error) {
+      console.error("Error al eliminar seguimiento:", error)
+      throw error
+    }
+  }
+
   static async getPendingRequests(userId) {
     try {
       const results = await query(

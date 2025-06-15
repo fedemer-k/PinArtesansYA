@@ -12,16 +12,20 @@ exports.getImageView = [
       // Buscar la imagen por ID
       const image = await Image.findByIdWithDetails(imageId)
       if (!image) {
+        console.error(`Imagen con ID ${imageId} no encontrada`)
         return res.status(404).render("errors/404", {
           title: "Imagen no encontrada - PinArtesans",
+          message: "La imagen que estás buscando no existe o ha sido eliminada.",
         })
       }
 
       // Verificar permisos de visualización
       const canView = await Image.canUserView(imageId, currentUserId)
       if (!canView) {
+        console.error(`Usuario ${currentUserId || "anónimo"} intentó acceder a imagen ${imageId} sin permisos`)
         return res.status(403).render("errors/403", {
           title: "Acceso denegado - PinArtesans",
+          message: "No tienes permisos para ver esta imagen.",
         })
       }
 

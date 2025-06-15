@@ -7,6 +7,6 @@ block content
         i.fas.fa-lock
       h1.error-title 403
       h2.error-subtitle Acceso denegado
-      p.error-message No tienes permisos para ver este contenido.
+      p.error-message= message || "No tienes permisos para ver este contenido."
       .error-actions
         a.primary-btn(href="/") Volver al inicio
