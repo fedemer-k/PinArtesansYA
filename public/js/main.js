@@ -78,22 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // Cargar contador de notificaciones
-  async function loadNotificationCount() {
-    try {
-      const response = await fetch("/api/notifications/count")
-      const data = await response.json()
-      const notificationCountElement = document.getElementById("notificationCount")
-
-      if (notificationCountElement && data.count > 0) {
-        notificationCountElement.textContent = data.count
-        notificationCountElement.style.display = "block"
-      }
-    } catch (error) {
-      console.error("Error al cargar contador de notificaciones:", error)
-    }
-  }
-
   // Cargar notificaciones recientes
   async function loadRecentNotifications() {
     try {
@@ -143,11 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (diffDays < 7) return `hace ${diffDays} días`
     if (diffDays < 30) return `hace ${Math.ceil(diffDays / 7)} semanas`
     return date.toLocaleDateString()
-  }
-
-  // Cargar contador inicial
-  if (document.getElementById("notificationCount")) {
-    loadNotificationCount()
   }
 
   // Funcionalidad de búsqueda de usuarios
@@ -400,7 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Notifications page functionality
+  // Notifications page functionality - SOLO FILTROS, NO BOTONES
   if (window.location.pathname === "/notifications") {
     // Filter functionality
     const filterBtn = document.getElementById("filterBtn")
@@ -423,199 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Filtering by:", filter)
       })
     })
-
-    // Mark as read functionality
-    const markReadButtons = document.querySelectorAll(".mark-read-btn")
-    markReadButtons.forEach((button) => {
-      button.addEventListener("click", async (e) => {
-        e.stopPropagation()
-        const notificationId = button.dataset.id
-
-        try {
-          const response = await fetch(`/notifications/${notificationId}/read`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-
-          const result = await response.json()
-
-          if (result.success) {
-            const notificationItem = button.closest(".notification-item-full")
-            notificationItem.classList.remove("unread")
-
-            // Update button to show read state
-            const actionsContainer = button.closest(".notification-actions")
-            actionsContainer.innerHTML = `
-              <div class="normal-actions">
-                <div class="read-indicator">
-                  <i class="fas fa-check-double"></i>
-                  <span>Leída</span>
-                </div>
-              </div>
-            `
-
-            // Update notification count in header
-            if (result.newCount !== undefined) {
-              const notificationCountElement = document.getElementById("notificationCount")
-              if (notificationCountElement) {
-                if (result.newCount > 0) {
-                  notificationCountElement.textContent = result.newCount
-                  notificationCountElement.style.display = "block"
-                } else {
-                  notificationCountElement.style.display = "none"
-                }
-              }
-            }
-          }
-        } catch (error) {
-          console.error("Error marking notification as read:", error)
-        }
-      })
-    })
-
-    // Accept follow request functionality
-    const acceptButtons = document.querySelectorAll(".accept-request-btn")
-    acceptButtons.forEach((button) => {
-      button.addEventListener("click", async (e) => {
-        e.stopPropagation()
-        const requestId = button.dataset.requestId
-
-        try {
-          button.disabled = true
-          button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aceptando...'
-
-          const response = await fetch(`/api/follow/respond/${requestId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ action: "accept" }),
-          })
-
-          const result = await response.json()
-
-          if (result.success) {
-            const notificationItem = button.closest(".notification-item-full")
-            const actionsContainer = button.closest(".notification-actions")
-
-            // Replace buttons with success message
-            actionsContainer.innerHTML = `
-              <div class="follow-response-success">
-                <i class="fas fa-check-circle"></i>
-                <span>Solicitud aceptada</span>
-              </div>
-            `
-
-            // Update notification count
-            loadNotificationCount()
-          } else {
-            alert(result.message || "Error al aceptar solicitud")
-            button.disabled = false
-            button.innerHTML = '<i class="fas fa-user-check"></i> Aceptar'
-          }
-        } catch (error) {
-          console.error("Error accepting follow request:", error)
-          alert("Error al aceptar solicitud")
-          button.disabled = false
-          button.innerHTML = '<i class="fas fa-user-check"></i> Aceptar'
-        }
-      })
-    })
-
-    // Reject follow request functionality
-    const rejectButtons = document.querySelectorAll(".reject-request-btn")
-    rejectButtons.forEach((button) => {
-      button.addEventListener("click", async (e) => {
-        e.stopPropagation()
-        const requestId = button.dataset.requestId
-
-        try {
-          button.disabled = true
-          button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rechazando...'
-
-          const response = await fetch(`/api/follow/respond/${requestId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ action: "reject" }),
-          })
-
-          const result = await response.json()
-
-          if (result.success) {
-            const notificationItem = button.closest(".notification-item-full")
-            const actionsContainer = button.closest(".notification-actions")
-
-            // Replace buttons with rejection message
-            actionsContainer.innerHTML = `
-              <div class="follow-response-rejected">
-                <i class="fas fa-times-circle"></i>
-                <span>Solicitud rechazada</span>
-              </div>
-            `
-
-            // Update notification count
-            loadNotificationCount()
-          } else {
-            alert(result.message || "Error al rechazar solicitud")
-            button.disabled = false
-            button.innerHTML = '<i class="fas fa-user-times"></i> Rechazar'
-          }
-        } catch (error) {
-          console.error("Error rejecting follow request:", error)
-          alert("Error al rechazar solicitud")
-          button.disabled = false
-          button.innerHTML = '<i class="fas fa-user-times"></i> Rechazar'
-        }
-      })
-    })
-
-    // Mark all as read
-    const markAllReadBtn = document.getElementById("markAllRead")
-    if (markAllReadBtn) {
-      markAllReadBtn.addEventListener("click", async () => {
-        try {
-          const response = await fetch("/notifications/mark-all-read", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-
-          const result = await response.json()
-
-          if (result.success) {
-            document.querySelectorAll(".notification-item-full.unread").forEach((item) => {
-              item.classList.remove("unread")
-            })
-            document.querySelectorAll(".mark-read-btn").forEach((button) => {
-              const actionsContainer = button.closest(".notification-actions")
-              if (actionsContainer && !actionsContainer.querySelector(".follow-request-actions")) {
-                actionsContainer.innerHTML = `
-                  <div class="normal-actions">
-                    <div class="read-indicator">
-                      <i class="fas fa-check-double"></i>
-                      <span>Leída</span>
-                    </div>
-                  </div>
-                `
-              }
-            })
-
-            // Update notification count
-            const notificationCountElement = document.getElementById("notificationCount")
-            if (notificationCountElement) {
-              notificationCountElement.style.display = "none"
-            }
-          }
-        } catch (error) {
-          console.error("Error marking all notifications as read:", error)
-        }
-      })
-    }
   }
 
   // Animaciones CSS adicionales

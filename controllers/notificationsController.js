@@ -13,6 +13,8 @@ exports.getNotificationsPage = [
         title: "Notificaciones - PinArtesans",
         notifications: notifications,
         pendingRequests: pendingFollowRequests,
+        successMessage: req.query.success,
+        errorMessage: req.query.error,
       })
     } catch (error) {
       console.error("Error al cargar notificaciones:", error)
@@ -56,13 +58,10 @@ exports.markAsRead = [
       const notificationId = req.params.id
       await Notificacion.markAsRead(notificationId, req.user.id)
 
-      // Obtener nuevo contador
-      const count = await Notificacion.getUnreadCount(req.user.id)
-
-      res.json({ success: true, newCount: count })
+      res.redirect("/notifications?success=Notificación marcada como leída")
     } catch (error) {
       console.error("Error al marcar notificación como leída:", error)
-      res.status(500).json({ success: false, message: "Error del servidor" })
+      res.redirect("/notifications?error=Error al marcar notificación como leída")
     }
   },
 ]
@@ -73,10 +72,10 @@ exports.markAllAsRead = [
     try {
       await Notificacion.markAllAsRead(req.user.id)
 
-      res.json({ success: true, newCount: 0 })
+      res.redirect("/notifications?success=Todas las notificaciones marcadas como leídas")
     } catch (error) {
       console.error("Error al marcar todas las notificaciones como leídas:", error)
-      res.status(500).json({ success: false, message: "Error del servidor" })
+      res.redirect("/notifications?error=Error al marcar todas las notificaciones como leídas")
     }
   },
 ]
@@ -91,23 +90,23 @@ exports.respondFollowRequest = [
 
       const followRequest = await Seguimiento.findById(requestId)
       if (!followRequest || followRequest.id_usuarioseguido != currentUserId) {
-        return res.status(404).json({
-          success: false,
-          message: "Solicitud no encontrada",
-        })
+        return res.redirect("/notifications?error=Solicitud no encontrada")
       }
 
       let newStatus
       let notificationMessage
+      let successMessage
       const requesterUser = await User.findById(followRequest.id_usuario)
       const currentUser = await User.findById(currentUserId)
 
       if (action === "accept") {
         newStatus = 1 // Aceptada
         notificationMessage = `${currentUser.nombre} aceptó tu solicitud de seguimiento`
+        successMessage = "Solicitud de seguimiento aceptada correctamente"
       } else {
         newStatus = 2 // Rechazada
         notificationMessage = `${currentUser.nombre} rechazó tu solicitud de seguimiento`
+        successMessage = "Solicitud de seguimiento rechazada correctamente"
       }
 
       // Actualizar estado de la solicitud
@@ -120,16 +119,10 @@ exports.respondFollowRequest = [
         id_tiponotificacion: action === "accept" ? 2 : 3, // Aceptada o Rechazada
       })
 
-      res.json({
-        success: true,
-        message: action === "accept" ? "Solicitud aceptada" : "Solicitud rechazada",
-      })
+      res.redirect(`/notifications?success=${encodeURIComponent(successMessage)}`)
     } catch (error) {
       console.error("Error al responder solicitud:", error)
-      res.status(500).json({
-        success: false,
-        message: "Error al procesar solicitud",
-      })
+      res.redirect("/notifications?error=Error al procesar la solicitud de seguimiento")
     }
   },
 ]
