@@ -5,22 +5,40 @@ block content
     .album-header
       .album-info
         h2.album-title= album.titulo
+        if albumOwner && albumOwner.nombre
+          p.album-owner
+            span Por: 
+            a(href=`/profile/${albumOwner.nombre}`)= albumOwner.nombre
         p.album-meta #{images.length} imagen(es)
       
-      .album-actions
-        button.edit-album-btn(data-album-id=album.id_album, data-album-title=album.titulo)
-          i.fas.fa-edit
-          span Editar Álbum
-        a.upload-to-album-btn(href=`/upload?album=${album.id_album}`)
-          i.fas.fa-plus
-          span Agregar Imágenes
+      if canEdit
+        .album-actions
+          button.edit-album-btn(data-album-id=album.id_album, data-album-title=album.titulo)
+            i.fas.fa-edit
+            span Editar Álbum
+          a.upload-to-album-btn(href=`/upload?album=${album.id_album}`)
+            i.fas.fa-plus
+            span Agregar Imágenes
+      else if userType === 'follower' || userType === 'user'
+        .album-info-guest
+          p.viewing-as
+            if userType === 'follower'
+              i.fas.fa-users
+              span Viendo como seguidor
+            else
+              i.fas.fa-eye
+              span Vista pública
     
     if images && images.length > 0
       .images-grid(id="imagesGrid")
         each image in images
           .image-card(data-image-id=image.id_imagen)
             .image-preview
-              img(src=image.ruta_imagen, alt=image.titulo || 'Imagen', onclick=`window.location.href='/image/${image.id_imagen}'`)
+              if canEdit
+                img(src=image.ruta_imagen, alt=image.titulo || 'Imagen', onclick=`window.location.href='/image/${image.id_imagen}'`)
+              else
+                img(src=image.ruta_imagen, alt=image.titulo || 'Imagen', onclick=`window.location.href='/image/${image.id_imagen}'`, style="cursor: pointer")
+              
               .image-overlay
                 .overlay-stats
                   .stat-item
@@ -45,121 +63,134 @@ block content
               if image.descripcion
                 p.image-description= image.descripcion.substring(0, 100) + (image.descripcion.length > 100 ? '...' : '')
               
-              .image-actions
-                button.edit-image-btn(data-image-id=image.id_imagen)
-                  i.fas.fa-edit
-                  span Editar
-                button.move-image-btn(data-image-id=image.id_imagen)
-                  i.fas.fa-arrows-alt
-                  span Mover
-                button.delete-image-btn(data-image-id=image.id_imagen, data-image-title=image.titulo)
-                  i.fas.fa-trash
-                  span Eliminar
+              if canEdit
+                .image-actions
+                  button.edit-image-btn(data-image-id=image.id_imagen)
+                    i.fas.fa-edit
+                    span Editar
+                  button.move-image-btn(data-image-id=image.id_imagen)
+                    i.fas.fa-arrows-alt
+                    span Mover
+                  button.delete-image-btn(data-image-id=image.id_imagen, data-image-title=image.titulo)
+                    i.fas.fa-trash
+                    span Eliminar
+              else
+                .image-actions-guest
+                  a.view-image-btn(href=`/image/${image.id_imagen}`)
+                    i.fas.fa-eye
+                    span Ver detalles
     else
       .no-images
         i.fas.fa-images
-        h3 Este álbum está vacío
-        p Agrega algunas imágenes para comenzar
-        a.primary-btn(href=`/upload?album=${album.id_album}`)
-          i.fas.fa-plus
-          span Agregar Imágenes
+        if canEdit
+          h3 Este álbum está vacío
+          p Agrega algunas imágenes para comenzar
+          a.primary-btn(href=`/upload?album=${album.id_album}`)
+            i.fas.fa-plus
+            span Agregar Imágenes
+        else
+          h3 No hay imágenes disponibles
+          p Este álbum no tiene imágenes públicas o no tienes permisos para verlas
 
-  // Modal para editar álbum
-  .modal(id="albumModal")
-    .modal-content
-      .modal-header
-        h3 Editar Álbum
-        button.modal-close(id="closeAlbumModal")
-          i.fas.fa-times
-      
-      .modal-body
-        form.album-form(id="albumForm")
-          .form-group
-            label(for="albumTitle") Título del álbum
-            input(type="text", id="albumTitle", name="titulo", required, maxlength="100")
-            .character-count
-              span.current-count 0
-              span /100
-          
-          .form-actions
-            button.cancel-btn(type="button", id="cancelAlbumBtn") Cancelar
-            button.save-btn(type="submit") Guardar Cambios
+  // Modales solo para el propietario
+  if canEdit
+    // Modal para editar álbum
+    .modal(id="albumModal")
+      .modal-content
+        .modal-header
+          h3 Editar Álbum
+          button.modal-close(id="closeAlbumModal")
+            i.fas.fa-times
+        
+        .modal-body
+          form.album-form(id="albumForm")
+            .form-group
+              label(for="albumTitle") Título del álbum
+              input(type="text", id="albumTitle", name="titulo", required, maxlength="100")
+              .character-count
+                span.current-count 0
+                span /100
+            
+            .form-actions
+              button.cancel-btn(type="button", id="cancelAlbumBtn") Cancelar
+              button.save-btn(type="submit") Guardar Cambios
 
-  // Modal para editar imagen
-  .modal(id="imageModal")
-    .modal-content
-      .modal-header
-        h3 Editar Imagen
-        button.modal-close(id="closeImageModal")
-          i.fas.fa-times
-      
-      .modal-body
-        form.image-form(id="imageForm", enctype="multipart/form-data")
-          .image-preview-section
-            .current-image-preview(id="currentImagePreview")
-            .file-input-group
-              input(type="file", id="newImageFile", name="newImage", accept="image/*")
-              .file-input-label
-                i.fas.fa-camera
-                span Cambiar imagen
-          
-          .form-group
-            label(for="imageTitle") Título
-            input(type="text", id="imageTitle", name="titulo", maxlength="255")
-          
-          .form-group
-            label(for="imageDescription") Descripción
-            textarea(id="imageDescription", name="descripcion", rows="4", maxlength="1000")
-            .character-count
-              span.current-count 0
-              span /1000
-          
-          .form-group
-            label(for="imagePrivacy") Privacidad
-            select(id="imagePrivacy", name="privacidad")
-              option(value="0") Privada (solo yo)
-              option(value="1") Seguidores
-              option(value="2") Pública (modo vitrina)
-              option(value="3") Usuario específico
-          
-          .shared-users-section(id="sharedUsersSection", style="display: none;")
-            label Compartir con:
-            .followers-list(id="followersList")
-              each follower in followers
-                .follower-item
-                  input(type="checkbox", id=`follower_${follower.id_usuario}`, name="sharedUsers", value=follower.id_usuario)
-                  label(for=`follower_${follower.id_usuario}`)
-                    if follower.imagen_perfil
-                      img(src=follower.imagen_perfil, alt=follower.nombre)
-                    else
-                      img(src="/uploads/profiles/default.png", alt=follower.nombre)
-                    span= follower.nombre
-          
-          .form-actions
-            button.cancel-btn(type="button", id="cancelImageBtn") Cancelar
-            button.save-btn(type="submit") Guardar Cambios
+    // Modal para editar imagen
+    .modal(id="imageModal")
+      .modal-content
+        .modal-header
+          h3 Editar Imagen
+          button.modal-close(id="closeImageModal")
+            i.fas.fa-times
+        
+        .modal-body
+          form.image-form(id="imageForm", enctype="multipart/form-data")
+            .image-preview-section
+              .current-image-preview(id="currentImagePreview")
+              .file-input-group
+                input(type="file", id="newImageFile", name="newImage", accept="image/*")
+                .file-input-label
+                  i.fas.fa-camera
+                  span Cambiar imagen
+            
+            .form-group
+              label(for="imageTitle") Título
+              input(type="text", id="imageTitle", name="titulo", maxlength="255")
+            
+            .form-group
+              label(for="imageDescription") Descripción
+              textarea(id="imageDescription", name="descripcion", rows="4", maxlength="1000")
+              .character-count
+                span.current-count 0
+                span /1000
+            
+            .form-group
+              label(for="imagePrivacy") Privacidad
+              select(id="imagePrivacy", name="privacidad")
+                option(value="0") Privada (solo yo)
+                option(value="1") Seguidores
+                option(value="2") Pública (modo vitrina)
+                option(value="3") Usuario específico
+            
+            .shared-users-section(id="sharedUsersSection", style="display: none;")
+              label Compartir con:
+              .followers-list(id="followersList")
+                each follower in followers
+                  .follower-item
+                    input(type="checkbox", id=`follower_${follower.id_usuario}`, name="sharedUsers", value=follower.id_usuario)
+                    label(for=`follower_${follower.id_usuario}`)
+                      if follower.imagen_perfil
+                        img(src=follower.imagen_perfil, alt=follower.nombre)
+                      else
+                        img(src="/uploads/profiles/default.png", alt=follower.nombre)
+                      span= follower.nombre
+            
+            .form-actions
+              button.cancel-btn(type="button", id="cancelImageBtn") Cancelar
+              button.save-btn(type="submit") Guardar Cambios
 
-  // Modal para mover imagen
-  .modal(id="moveModal")
-    .modal-content
-      .modal-header
-        h3 Mover Imagen
-        button.modal-close(id="closeMoveModal")
-          i.fas.fa-times
-      
-      .modal-body
-        form.move-form(id="moveForm")
-          .form-group
-            label(for="targetAlbum") Mover a álbum:
-            select(id="targetAlbum", name="newAlbumId", required)
-              option(value="") Seleccionar álbum...
-              each albumOption in albums || []
-                if albumOption.id_album !== album.id_album
-                  option(value=albumOption.id_album)= albumOption.titulo
-          
-          .form-actions
-            button.cancel-btn(type="button", id="cancelMoveBtn") Cancelar
-            button.save-btn(type="submit") Mover Imagen
+    // Modal para mover imagen
+    .modal(id="moveModal")
+      .modal-content
+        .modal-header
+          h3 Mover Imagen
+          button.modal-close(id="closeMoveModal")
+            i.fas.fa-times
+        
+        .modal-body
+          form.move-form(id="moveForm")
+            .form-group
+              label(for="targetAlbum") Mover a álbum:
+              select(id="targetAlbum", name="newAlbumId", required)
+                option(value="") Seleccionar álbum...
+                each albumOption in albums || []
+                  if albumOption.id_album !== album.id_album
+                    option(value=albumOption.id_album)= albumOption.titulo
+            
+            .form-actions
+              button.cancel-btn(type="button", id="cancelMoveBtn") Cancelar
+              button.save-btn(type="submit") Mover Imagen
 
 block append scripts
-  script(src="/js/album-detail.js")
+  if canEdit
+    script(src="/js/album-detail.js")

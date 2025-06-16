@@ -2,6 +2,7 @@ const { requireAuth } = require("../middleware/auth")
 const { Album, Image } = require("../models/gallery")
 const { ImagenCompartida } = require("../models/sharing")
 const { Seguimiento } = require("../models/social")
+const User = require("../models/user")
 const { upload, handleMulterError } = require("../config/multer")
 const fs = require("fs")
 
@@ -25,26 +26,81 @@ exports.getAlbumsPage = [
 ]
 
 exports.getAlbumDetail = [
-  requireAuth,
   async (req, res) => {
     try {
       const albumId = req.params.id
-      const album = await Album.findById(albumId)
+      const currentUserId = req.user ? req.user.id : null
 
-      if (!album || album.id_usuario !== req.user.id) {
+      // Buscar el álbum
+      const album = await Album.findById(albumId)
+      if (!album) {
         return res.status(404).render("errors/404", {
           title: "Álbum no encontrado - PinArtesans",
         })
       }
 
-      const images = await Image.getByAlbumWithDetails(albumId)
-      const followers = await Seguimiento.getFollowers(req.user.id)
+      // Obtener información del propietario del álbum
+      const albumOwner = await User.findById(album.id_usuario)
+      if (!albumOwner) {
+        return res.status(404).render("errors/404", {
+          title: "Usuario no encontrado - PinArtesans",
+        })
+      }
+
+      // Determinar el tipo de usuario que está viendo
+      let userType = "guest" // Por defecto usuario no registrado
+      let isFollowing = false
+
+      if (currentUserId) {
+        if (currentUserId === album.id_usuario) {
+          userType = "owner"
+        } else {
+          // Verificar si es seguidor usando el método existente
+          isFollowing = await User.isFollowing(currentUserId, album.id_usuario)
+          if (isFollowing) {
+            userType = "follower"
+          } else {
+            userType = "user" // Usuario registrado pero no seguidor
+          }
+        }
+      }
+
+      // Obtener imágenes según el tipo de usuario
+      let images = []
+
+      if (userType === "owner") {
+        // Propietario: ve todas las imágenes
+        images = await Image.getByAlbumWithDetails(albumId)
+      } else if (userType === "follower") {
+        // Seguidor: ve imágenes públicas, para seguidores y compartidas específicamente
+        images = await Image.getByAlbumWithDetailsFollower(albumId, currentUserId, albumOwner.modo_vitrina)
+      } else {
+        // Usuario no registrado o no seguidor: solo imágenes públicas si modo vitrina está activo
+        images = await Image.getByAlbumWithDetailsPublic(albumId, albumOwner.modo_vitrina)
+      }
+
+      // Si no hay imágenes visibles y no es el propietario, mostrar 404
+      if (images.length === 0 && userType !== "owner") {
+        return res.status(404).render("errors/404", {
+          title: "Álbum no encontrado - PinArtesans",
+        })
+      }
+
+      // Obtener seguidores solo si es el propietario
+      let followers = []
+      if (userType === "owner") {
+        followers = await Seguimiento.getFollowers(currentUserId)
+      }
 
       res.render("album-detail", {
         title: `${album.titulo} - PinArtesans`,
         album: album,
+        albumOwner: albumOwner,
         images: images,
         followers: followers,
+        userType: userType,
+        isFollowing: isFollowing,
+        canEdit: userType === "owner",
       })
     } catch (error) {
       console.error("Error al cargar detalle del álbum:", error)

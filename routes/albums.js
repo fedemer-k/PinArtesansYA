@@ -1,11 +1,11 @@
 const express = require("express")
 const router = express.Router()
 const albumsController = require("../controllers/albumsController")
-const { requireAuth } = require("../middleware/auth")
+const { requireAuth, getCurrentUser } = require("../middleware/auth")
 
-// Rutas de álbumes (requieren autenticación)
-router.get("/", requireAuth, albumsController.getAlbumsPage)
-router.get("/:id", requireAuth, albumsController.getAlbumDetail)
+// Rutas de álbumes
+router.get("/", requireAuth, albumsController.getAlbumsPage) // Mantener como estaba
+router.get("/:id", getCurrentUser, albumsController.getAlbumDetail) // Sin requireAuth para acceso público
 router.post("/", requireAuth, albumsController.createAlbum)
 router.put("/:id", requireAuth, albumsController.updateAlbum)
 router.delete("/:id", requireAuth, albumsController.deleteAlbum)

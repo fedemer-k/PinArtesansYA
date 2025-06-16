@@ -12,36 +12,72 @@ class Image {
     this.id_album = data.id_album
   }
 
-  static async getFromFollowing(userId) {
+static async getFromFollowing(userId) {
     try {
-      const sql = `
-        SELECT i.*, a.id_usuario as owner_id, u.nombre as owner_name
-        FROM Imagen i
-        JOIN Album a ON i.id_album = a.id_album
-        JOIN Usuario u ON a.id_usuario = u.id_usuario
-        JOIN Seguimiento s ON s.id_usuarioseguido = u.id_usuario
-        WHERE s.id_usuario = ? 
-          AND s.id_estadosolicitud = 1
-          AND (i.privacidad = 1 OR (i.privacidad = 2 AND u.modo_vitrina = TRUE))
-        ORDER BY i.fecha_subida DESC
-        LIMIT 50
-      `
+        // 1. Imágenes públicas con modo vitrina activado
+        const publicShowcaseSql = `
+            SELECT i.*, a.id_usuario as owner_id, u.nombre as owner_name
+            FROM Imagen i
+            JOIN Album a ON i.id_album = a.id_album
+            JOIN Usuario u ON a.id_usuario = u.id_usuario
+            WHERE i.privacidad = 2 AND u.modo_vitrina = TRUE
+        `
 
-      const results = await query(sql, [userId])
+        // 2. Imágenes de personas que sigue el usuario actual (privacidad = 1)
+        const followingSql = `
+            SELECT i.*, a.id_usuario as owner_id, u.nombre as owner_name
+            FROM Imagen i
+            JOIN Album a ON i.id_album = a.id_album
+            JOIN Usuario u ON a.id_usuario = u.id_usuario
+            JOIN Seguimiento s ON s.id_usuarioseguido = u.id_usuario
+            WHERE s.id_usuario = ? 
+            AND s.id_estadosolicitud = 1
+            AND i.privacidad = 1
+        `
 
-      return results.map((img) => ({
-        id: img.id_imagen,
-        src: img.ruta_imagen,
-        likes: 0, // Se implementará con tabla de likes
-        comments: 0, // Se calculará desde tabla de comentarios
-        title: img.titulo,
-        owner: img.owner_name,
-      }))
-    } catch (error) {
-      console.error("Error al obtener imágenes de seguidos:", error)
-      throw error
+        // 3. Imágenes compartidas específicamente con el usuario actual (privacidad = 3)
+        const sharedSql = `
+            SELECT i.*, a.id_usuario as owner_id, u.nombre as owner_name
+            FROM Imagen i
+            JOIN Album a ON i.id_album = a.id_album
+            JOIN Usuario u ON a.id_usuario = u.id_usuario
+            JOIN ImagenCompartida ic ON ic.id_imagen = i.id_imagen
+            WHERE ic.id_usuarioacompartir = ? AND i.privacidad = 3
+        `
+
+        // Ejecutar las tres consultas
+        const [publicShowcase, following, shared] = await Promise.all([
+            query(publicShowcaseSql),
+            query(followingSql, [userId]),
+            query(sharedSql, [userId])
+        ])
+
+        // Unir y eliminar duplicados por id_imagen
+        const allImages = [...publicShowcase, ...following, ...shared]
+        const uniqueImages = Object.values(
+            allImages.reduce((acc, img) => {
+            acc[img.id_imagen] = img
+            return acc
+            }, {})
+        )
+
+        // Ordenar por fecha de subida descendente
+        uniqueImages.sort((a, b) => new Date(b.fecha_subida) - new Date(a.fecha_subida))
+
+        // Formatear la salida
+        return uniqueImages.map((img) => ({
+            id: img.id_imagen,
+            src: img.ruta_imagen,
+            likes: 0,
+            comments: 0,
+            title: img.titulo,
+            owner: img.owner_name,
+        }))
+        } catch (error) {
+            console.error("Error al obtener todas las imagenes del sitio:", error)
+            throw error
+        }
     }
-  }
 
   static async getPublic() {
     try {
@@ -363,6 +399,145 @@ class Image {
       }))
     } catch (error) {
       console.error("Error al obtener imágenes del álbum con detalles:", error)
+      throw error
+    }
+  }
+
+  static async getByAlbumWithDetailsFollower(albumId, followerId, ownerVitrineMode) {
+    try {
+      const sql = `
+        SELECT i.*, 
+               (SELECT COUNT(*) FROM Comentario c WHERE c.id_imagen = i.id_imagen) as comments_count,
+               (SELECT COUNT(*) FROM ImagenCompartida ic WHERE ic.id_imagen = i.id_imagen) as shared_count
+        FROM Imagen i 
+        WHERE i.id_album = ? 
+          AND (
+            i.privacidad = 1 OR 
+            (i.privacidad = 2 AND ? = TRUE) OR
+            (i.privacidad = 3 AND EXISTS (
+              SELECT 1 FROM ImagenCompartida ic2 
+              WHERE ic2.id_imagen = i.id_imagen AND ic2.id_usuarioacompartir = ?
+            ))
+          )
+        ORDER BY i.fecha_subida DESC
+      `
+
+      const results = await query(sql, [albumId, ownerVitrineMode, followerId])
+
+      return results.map((img) => ({
+        id_imagen: img.id_imagen,
+        titulo: img.titulo,
+        descripcion: img.descripcion,
+        ruta_imagen: img.ruta_imagen,
+        privacidad: img.privacidad,
+        fecha_subida: img.fecha_subida,
+        id_album: img.id_album,
+        comments_count: img.comments_count || 0,
+        shared_count: img.shared_count || 0,
+      }))
+    } catch (error) {
+      console.error("Error al obtener imágenes del álbum para seguidor:", error)
+      throw error
+    }
+  }
+
+  static async getByAlbumWithDetailsPublic(albumId, ownerVitrineMode) {
+    try {
+      // Si el propietario no tiene modo vitrina activo, no mostrar imágenes públicas
+      if (!ownerVitrineMode) {
+        return []
+      }
+
+      const sql = `
+        SELECT i.*, 
+               (SELECT COUNT(*) FROM Comentario c WHERE c.id_imagen = i.id_imagen) as comments_count,
+               (SELECT COUNT(*) FROM ImagenCompartida ic WHERE ic.id_imagen = i.id_imagen) as shared_count
+        FROM Imagen i 
+        WHERE i.id_album = ? 
+          AND i.privacidad = 2
+        ORDER BY i.fecha_subida DESC
+      `
+
+      const results = await query(sql, [albumId])
+
+      return results.map((img) => ({
+        id_imagen: img.id_imagen,
+        titulo: img.titulo,
+        descripcion: img.descripcion,
+        ruta_imagen: img.ruta_imagen,
+        privacidad: img.privacidad,
+        fecha_subida: img.fecha_subida,
+        id_album: img.id_album,
+        comments_count: img.comments_count || 0,
+        shared_count: img.shared_count || 0,
+      }))
+    } catch (error) {
+      console.error("Error al obtener imágenes públicas del álbum:", error)
+      throw error
+    }
+  }
+
+  static async getByAlbumForFollower(albumId, ownerVitrineMode) {
+    try {
+      const sql = `
+        SELECT i.*, 
+               (SELECT COUNT(*) FROM Comentario c WHERE c.id_imagen = i.id_imagen) as comments_count,
+               (SELECT COUNT(*) FROM ImagenCompartida ic WHERE ic.id_imagen = i.id_imagen) as shared_count
+        FROM Imagen i 
+        WHERE i.id_album = ? 
+          AND (
+            i.privacidad = 1 OR 
+            (i.privacidad = 2 AND ? = TRUE)
+          )
+        ORDER BY i.fecha_subida DESC
+      `
+
+      const results = await query(sql, [albumId, ownerVitrineMode])
+
+      return results.map((img) => ({
+        id_imagen: img.id_imagen,
+        titulo: img.titulo,
+        descripcion: img.descripcion,
+        ruta_imagen: img.ruta_imagen,
+        privacidad: img.privacidad,
+        fecha_subida: img.fecha_subida,
+        id_album: img.id_album,
+        comments_count: img.comments_count || 0,
+        shared_count: img.shared_count || 0,
+      }))
+    } catch (error) {
+      console.error("Error al obtener imágenes del álbum para seguidor:", error)
+      throw error
+    }
+  }
+
+  static async getByAlbumPublic(albumId) {
+    try {
+      const sql = `
+        SELECT i.*, 
+               (SELECT COUNT(*) FROM Comentario c WHERE c.id_imagen = i.id_imagen) as comments_count,
+               (SELECT COUNT(*) FROM ImagenCompartida ic WHERE ic.id_imagen = i.id_imagen) as shared_count
+        FROM Imagen i 
+        WHERE i.id_album = ? 
+          AND i.privacidad = 2
+        ORDER BY i.fecha_subida DESC
+      `
+
+      const results = await query(sql, [albumId])
+
+      return results.map((img) => ({
+        id_imagen: img.id_imagen,
+        titulo: img.titulo,
+        descripcion: img.descripcion,
+        ruta_imagen: img.ruta_imagen,
+        privacidad: img.privacidad,
+        fecha_subida: img.fecha_subida,
+        id_album: img.id_album,
+        comments_count: img.comments_count || 0,
+        shared_count: img.shared_count || 0,
+      }))
+    } catch (error) {
+      console.error("Error al obtener imágenes públicas del álbum:", error)
       throw error
     }
   }

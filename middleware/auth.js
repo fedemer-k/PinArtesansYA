@@ -44,11 +44,16 @@ const getCurrentUser = (req, res, next) => {
       const decoded = verifyToken(token)
       req.user = decoded
       res.locals.user = decoded
+    } else {
+      req.user = null
+      res.locals.user = null
     }
 
     next()
   } catch (error) {
     // Token inválido, continuar sin usuario
+    req.user = null
+    res.locals.user = null
     next()
   }
 }
