@@ -1,5 +1,4 @@
 const { verifyToken } = require("../config/jwt")
-const { Notificacion } = require("../models/social")
 
 // Middleware para verificar autenticación
 const requireAuth = (req, res, next) => {
@@ -37,7 +36,7 @@ const redirectIfAuth = (req, res, next) => {
 }
 
 // Middleware para obtener usuario actual (opcional)
-const getCurrentUser = async (req, res, next) => {
+const getCurrentUser = (req, res, next) => {
   try {
     const token = req.cookies.jwt
 
@@ -45,19 +44,9 @@ const getCurrentUser = async (req, res, next) => {
       const decoded = verifyToken(token)
       req.user = decoded
       res.locals.user = decoded
-
-      // Obtener contador de notificaciones no leídas
-      try {
-        const notificationCount = await Notificacion.getUnreadCount(decoded.id)
-        res.locals.notificationCount = notificationCount
-      } catch (error) {
-        console.error("Error al obtener contador de notificaciones:", error)
-        res.locals.notificationCount = 0
-      }
     } else {
       req.user = null
       res.locals.user = null
-      res.locals.notificationCount = 0
     }
 
     next()
@@ -65,7 +54,6 @@ const getCurrentUser = async (req, res, next) => {
     // Token inválido, continuar sin usuario
     req.user = null
     res.locals.user = null
-    res.locals.notificationCount = 0
     next()
   }
 }

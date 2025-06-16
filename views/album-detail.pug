@@ -8,7 +8,7 @@ block content
         if albumOwner && albumOwner.nombre
           p.album-owner
             span Por: 
-            a(href=`/profile/${albumOwner.id_usuario}`)= albumOwner.nombre
+            a(href=`/profile/${albumOwner.nombre}`)= albumOwner.nombre
         p.album-meta #{images.length} imagen(es)
       
       if canEdit

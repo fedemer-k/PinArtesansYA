@@ -5,22 +5,10 @@ block content
     .notifications-header
       h2 Notificaciones
       .notifications-actions
-        form(action="/notifications/mark-all-read", method="POST", style="display: inline;")
-          button.mark-all-read(type="submit") Marcar todas como leídas
+        button.mark-all-read(id="markAllRead") Marcar todas como leídas
         button.filter-btn(id="filterBtn")
           i.fas.fa-filter
           span Filtrar
-    
-    // Mensajes de éxito y error
-    if successMessage
-      .alert.alert-success
-        i.fas.fa-check-circle
-        span= successMessage
-    
-    if errorMessage
-      .alert.alert-error
-        i.fas.fa-exclamation-triangle
-        span= errorMessage
     
     .notifications-filters(id="notificationsFilters", style="display: none;")
       .filter-options
@@ -43,30 +31,24 @@ block content
             span.notification-time= notification.fecha
           .notification-actions
             if notification.tipo && notification.tipo.includes('Seguimiento') && notification.id_tiponotificacion === 1 && notification.follow_request_id
-              // Solicitud de seguimiento pendiente - mostrar formularios
+              // Solicitud de seguimiento pendiente - mostrar los 3 botones
               .follow-request-actions
-                form(action=`/notifications/follow-request/${notification.follow_request_id}`, method="POST", style="display: inline;")
-                  input(type="hidden", name="action", value="accept")
-                  button.accept-request-btn(type="submit", title="Aceptar solicitud")
-                    i.fas.fa-user-check
-                    span Aceptar
-                form(action=`/notifications/follow-request/${notification.follow_request_id}`, method="POST", style="display: inline;")
-                  input(type="hidden", name="action", value="reject")
-                  button.reject-request-btn(type="submit", title="Rechazar solicitud")
-                    i.fas.fa-user-times
-                    span Rechazar
-                form(action=`/notifications/${notification.id_notificacion}/read`, method="POST", style="display: inline;")
-                  button.mark-read-btn(type="submit", title="Marcar como leída")
-                    i.fas.fa-check-circle
-                    span Leída
+                button.accept-request-btn(data-request-id=notification.follow_request_id, title="Aceptar solicitud")
+                  i.fas.fa-user-check
+                  span Aceptar
+                button.reject-request-btn(data-request-id=notification.follow_request_id, title="Rechazar solicitud")
+                  i.fas.fa-user-times
+                  span Rechazar
+                button.mark-read-btn(data-id=notification.id_notificacion, title="Marcar como leída")
+                  i.fas.fa-check-circle
+                  span Leída
             else
               // Notificación normal - solo botón de marcar como leída
               .normal-actions
                 if !notification.leida
-                  form(action=`/notifications/${notification.id_notificacion}/read`, method="POST", style="display: inline;")
-                    button.mark-read-btn(type="submit", title="Marcar como leída")
-                      i.fas.fa-check-circle
-                      span Marcar como leída
+                  button.mark-read-btn(data-id=notification.id_notificacion, title="Marcar como leída")
+                    i.fas.fa-check-circle
+                    span Marcar como leída
                 else
                   .read-indicator
                     i.fas.fa-check-double
@@ -84,20 +66,15 @@ block content
             span.notification-time hace 2 horas
           .notification-actions
             .follow-request-actions
-              form(action="/notifications/follow-request/1", method="POST", style="display: inline;")
-                input(type="hidden", name="action", value="accept")
-                button.accept-request-btn(type="submit", title="Aceptar solicitud")
-                  i.fas.fa-user-check
-                  span Aceptar
-              form(action="/notifications/follow-request/1", method="POST", style="display: inline;")
-                input(type="hidden", name="action", value="reject")
-                button.reject-request-btn(type="submit", title="Rechazar solicitud")
-                  i.fas.fa-user-times
-                  span Rechazar
-              form(action="/notifications/1/read", method="POST", style="display: inline;")
-                button.mark-read-btn(type="submit", title="Marcar como leída")
-                  i.fas.fa-check-circle
-                  span Leída
+              button.accept-request-btn(data-request-id="1", title="Aceptar solicitud")
+                i.fas.fa-user-check
+                span Aceptar
+              button.reject-request-btn(data-request-id="1", title="Rechazar solicitud")
+                i.fas.fa-user-times
+                span Rechazar
+              button.mark-read-btn(data-id="1", title="Marcar como leída")
+                i.fas.fa-check-circle
+                span Leída
         
         .notification-item-full
           .notification-avatar
@@ -123,10 +100,9 @@ block content
             span.notification-time hace 1 día
           .notification-actions
             .normal-actions
-              form(action="/notifications/3/read", method="POST", style="display: inline;")
-                button.mark-read-btn(type="submit", title="Marcar como leída")
-                  i.fas.fa-check-circle
-                  span Marcar como leída
+              button.mark-read-btn(data-id="3", title="Marcar como leída")
+                i.fas.fa-check-circle
+                span Marcar como leída
     
     .load-more-notifications
       button.load-more-btn(id="loadMoreNotifications") Cargar más notificaciones

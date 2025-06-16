@@ -22,10 +22,7 @@ header.header
           .notifications-menu
             button.notifications-btn(id="notificationsToggle")
               i.fas.fa-bell
-              if notificationCount && notificationCount > 0
-                .notification-badge(id="notificationCount")= notificationCount
-              else
-                .notification-badge(id="notificationCount", style="display: none;")
+              .notification-badge(id="notificationCount", style="display: none;")
             
             .notifications-dropdown(id="notificationsDropdown")
               .dropdown-header

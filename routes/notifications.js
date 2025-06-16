@@ -8,7 +8,4 @@ router.get("/", requireAuth, notificationsController.getNotificationsPage)
 router.post("/:id/read", requireAuth, notificationsController.markAsRead)
 router.post("/mark-all-read", requireAuth, notificationsController.markAllAsRead)
 
-// Ruta para responder solicitudes de seguimiento
-router.post("/follow-request/:requestId", requireAuth, notificationsController.respondFollowRequest)
-
 module.exports = router
