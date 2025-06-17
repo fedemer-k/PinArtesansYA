@@ -177,7 +177,7 @@ class Notificacion {
       const results = await query(
         `SELECT n.*, tn.tipo,
          CASE 
-           WHEN tn.tipo LIKE '%Seguimiento%' AND n.id_tiponotificacion = 1 THEN s.id_amistad
+           WHEN tn.tipo LIKE '%Seguimiento%' AND s.id_estadosolicitud = 3 THEN s.id_amistad
            ELSE NULL
          END as follow_request_id
          FROM Notificacion n
