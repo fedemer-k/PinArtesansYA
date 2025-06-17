@@ -3,7 +3,7 @@ extends layout
 block content
   .album-detail-container
     .album-header
-      .album-info
+      .album-info#album-detail
         h2.album-title= album.titulo
         if albumOwner && albumOwner.nombre
           p.album-owner
@@ -33,30 +33,28 @@ block content
       .images-grid(id="imagesGrid")
         each image in images
           .image-card(data-image-id=image.id_imagen)
-            .image-preview
-              if canEdit
-                img(src=image.ruta_imagen, alt=image.titulo || 'Imagen', onclick=`window.location.href='/image/${image.id_imagen}'`)
-              else
-                img(src=image.ruta_imagen, alt=image.titulo || 'Imagen', onclick=`window.location.href='/image/${image.id_imagen}'`, style="cursor: pointer")
+            a(href=`/image/${image.id_imagen}`)
+              .image-preview
+                img(src=image.ruta_imagen, alt=image.titulo || 'Imagen')
               
-              .image-overlay
-                .overlay-stats
-                  .stat-item
-                    i.fas.fa-comment
-                    span= image.comments_count
-                  if image.privacidad === 3 && image.shared_count > 0
+                .image-overlay
+                  .overlay-stats
                     .stat-item
-                      i.fas.fa-share
-                      span= image.shared_count
-                .privacy-indicator(class=`privacy-${image.privacidad}`)
-                  if image.privacidad === 0
-                    i.fas.fa-lock(title="Privada")
-                  else if image.privacidad === 1
-                    i.fas.fa-users(title="Seguidores")
-                  else if image.privacidad === 2
-                    i.fas.fa-globe(title="Pública")
-                  else if image.privacidad === 3
-                    i.fas.fa-user-friends(title="Usuario específico")
+                      i.fas.fa-comment
+                      span= image.comments_count
+                    if image.privacidad === 3 && image.shared_count > 0
+                      .stat-item
+                        i.fas.fa-share
+                        span= image.shared_count
+                  .privacy-indicator(class=`privacy-${image.privacidad}`)
+                    if image.privacidad === 0
+                      i.fas.fa-lock(title="Privada")
+                    else if image.privacidad === 1
+                      i.fas.fa-users(title="Seguidores")
+                    else if image.privacidad === 2
+                      i.fas.fa-globe(title="Pública")
+                    else if image.privacidad === 3
+                      i.fas.fa-user-friends(title="Usuario específico")
             
             .image-info
               h4.image-title= image.titulo || 'Sin título'
@@ -74,11 +72,6 @@ block content
                   button.delete-image-btn(data-image-id=image.id_imagen, data-image-title=image.titulo)
                     i.fas.fa-trash
                     span Eliminar
-              else
-                .image-actions-guest
-                  a.view-image-btn(href=`/image/${image.id_imagen}`)
-                    i.fas.fa-eye
-                    span Ver detalles
     else
       .no-images
         i.fas.fa-images

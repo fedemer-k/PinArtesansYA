@@ -2179,6 +2179,11 @@ input[type="checkbox"]:checked + label .toggle-slider {
 }
 
 .album-info {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.album-info#album-detail {
   font-size: 0.9rem;
   color: #6b7280;
   margin: 0;
@@ -2227,13 +2232,7 @@ input[type="checkbox"]:checked + label .toggle-slider {
 
 .image-info {
   text-align: center;
-}
-
-.image-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
+  padding: 1.5rem;
 }
 
 .image-description {
@@ -2639,12 +2638,8 @@ input[type="checkbox"]:checked + label .toggle-slider {
   font-weight: 600;
 }
 
-.album-info {
-  padding: 1.5rem;
-}
-
 .album-title {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 1rem;
@@ -2844,10 +2839,6 @@ input[type="checkbox"]:checked + label .toggle-slider {
 }
 .privacy-3 {
   color: #f59e0b;
-}
-
-.image-info {
-  padding: 1.5rem;
 }
 
 .image-title {

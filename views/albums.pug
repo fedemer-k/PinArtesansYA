@@ -11,24 +11,22 @@ block content
     .albums-grid(id="albumsGrid")
       each album in albums
         .album-card(data-album-id=album.id_album)
-          .album-cover
-            img(src=album.cover_image, alt=album.titulo)
-            .album-overlay
-              .album-stats
-                .stat-item
-                  i.fas.fa-images
-                  span #{album.image_count} imagen(es)
-                if album.last_updated
+          a(href=`/albums/${album.id_album}`)
+            .album-cover
+              img(src=album.cover_image, alt=album.titulo)
+              .album-overlay
+                .album-stats
                   .stat-item
-                    i.fas.fa-clock
-                    span= new Date(album.last_updated).toLocaleDateString('es-ES')
+                    i.fas.fa-images
+                    span #{album.image_count} imagen(es)
+                  if album.last_updated
+                    .stat-item
+                      i.fas.fa-clock
+                      span= new Date(album.last_updated).toLocaleDateString('es-ES')
           
           .album-info
             h3.album-title= album.titulo
             .album-actions
-              button.view-album-btn(onclick=`window.location.href='/albums/${album.id_album}'`)
-                i.fas.fa-eye
-                span Ver
               button.edit-album-btn(data-album-id=album.id_album, data-album-title=album.titulo)
                 i.fas.fa-edit
                 span Editar
