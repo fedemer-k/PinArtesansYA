@@ -6,6 +6,7 @@ const User = require("../models/user")
 const { upload, handleMulterError } = require("../config/multer")
 const fs = require("fs")
 
+//Aqui se muestran todos los albumes del usuario logueado
 exports.getAlbumsPage = [
   requireAuth,
   async (req, res) => {
@@ -25,6 +26,7 @@ exports.getAlbumsPage = [
   },
 ]
 
+// Aquí se muestra el detalle de un álbum específico vistas publicas, privadas y compartidas
 exports.getAlbumDetail = [
   async (req, res) => {
     try {
