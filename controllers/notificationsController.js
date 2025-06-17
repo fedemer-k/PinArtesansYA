@@ -6,7 +6,7 @@ exports.getNotificationsPage = [
   requireAuth,
   async (req, res) => {
     try {
-      const notifications = await Notificacion.getByUserWithDetails(req.user.id)
+      const notifications = await Notificacion.getByUserWithDetails(req.user.id, 20)
       const pendingFollowRequests = await Seguimiento.getPendingRequests(req.user.id)
 
       res.render("notifications", {
@@ -97,6 +97,33 @@ exports.respondFollowRequest = [
     } catch (error) {
       console.error("Error al responder solicitud:", error)
       res.redirect("/notifications?error=Error al procesar la solicitud de seguimiento")
+    }
+  },
+]
+
+//modo API
+exports.getNotificationsCount = [
+  requireAuth,
+  async (req, res) => {
+    try {
+      const count = await Notificacion.getUnreadCount(req.user.id)
+      res.json({ count })
+    } catch (error) {
+      console.error("Error al obtener contador de notificaciones:", error)
+      res.status(500).json({ success: false, message: "Error del servidor" })
+    }
+  },
+]
+
+exports.getRecentNotifications = [
+  requireAuth,
+  async (req, res) => {
+    try {
+      const notifications = await Notificacion.getByUserWithDetails(req.user.id, 5)
+      res.json(notifications)
+    } catch (error) {
+      console.error("Error al obtener notificaciones recientes:", error)
+      res.status(500).json({ success: false, message: "Error del servidor" })
     }
   },
 ]

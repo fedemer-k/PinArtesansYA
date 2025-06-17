@@ -379,30 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Notifications page functionality - SOLO FILTROS, NO BOTONES
-  if (window.location.pathname === "/notifications") {
-    // Filter functionality
-    const filterBtn = document.getElementById("filterBtn")
-    const notificationsFilters = document.getElementById("notificationsFilters")
-    const filterOptions = document.querySelectorAll(".filter-option")
 
-    if (filterBtn && notificationsFilters) {
-      filterBtn.addEventListener("click", () => {
-        notificationsFilters.style.display = notificationsFilters.style.display === "none" ? "block" : "none"
-      })
-    }
-
-    filterOptions.forEach((option) => {
-      option.addEventListener("click", () => {
-        filterOptions.forEach((opt) => opt.classList.remove("active"))
-        option.classList.add("active")
-
-        // Here you would implement the actual filtering logic
-        const filter = option.dataset.filter
-        console.log("Filtering by:", filter)
-      })
-    })
-  }
 
   // Animaciones CSS adicionales
   const style = document.createElement("style")

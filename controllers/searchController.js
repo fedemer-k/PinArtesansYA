@@ -2,26 +2,6 @@ const User = require("../models/user")
 const { Image } = require("../models/gallery")
 const { Seguimiento, Notificacion } = require("../models/social")
 
-exports.searchUsers = async (req, res) => {
-  try {
-    const { q: query } = req.query
-    const currentUserId = req.user ? req.user.id : null
-
-    if (!query || query.trim().length < 2) {
-      return res.json([])
-    }
-
-    const users = await User.searchByName(query.trim(), currentUserId)
-    res.json(users)
-  } catch (error) {
-    console.error("Error en búsqueda de usuarios:", error)
-    res.status(500).json({
-      success: false,
-      message: "Error al buscar usuarios",
-    })
-  }
-}
-
 exports.searchContent = async (req, res) => {
   try {
     const { q: query } = req.query
@@ -152,6 +132,27 @@ exports.respondFollowRequest = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error al procesar solicitud",
+    })
+  }
+}
+
+//Modo API para búsqueda de usuarios.
+exports.searchUsers = async (req, res) => {
+  try {
+    const { q: query } = req.query
+    const currentUserId = req.user ? req.user.id : null
+
+    if (!query || query.trim().length < 2) {
+      return res.json([])
+    }
+
+    const users = await User.searchByName(query.trim(), currentUserId)
+    res.json(users)
+  } catch (error) {
+    console.error("Error en búsqueda de usuarios:", error)
+    res.status(500).json({
+      success: false,
+      message: "Error al buscar usuarios",
     })
   }
 }

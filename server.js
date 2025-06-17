@@ -9,7 +9,6 @@ const { testConnection } = require("./config/database")
 const { getCurrentUser } = require("./middleware/auth")
 
 const app = express()
-const PORT = process.env.PORT || 3000
 
 // Crear directorios necesarios para uploads
 const uploadsDir = path.join(__dirname, "public", "uploads")
@@ -88,8 +87,8 @@ const startServer = async () => {
     // Probar conexión a la base de datos
     await testConnection()
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor PinArtesans corriendo en http://localhost:${PORT}`)
+    app.listen(process.env.PORT, () => {
+      console.log(`🚀 Servidor PinArtesans corriendo en http://localhost:${process.env.PORT}`)
       console.log(`📊 Entorno: ${process.env.NODE_ENV}`)
       console.log(`🗄️  Base de datos: ${process.env.DB_DATABASE}`)
       console.log(`📁 Directorios de uploads configurados:`)

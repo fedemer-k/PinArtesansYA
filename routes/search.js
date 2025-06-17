@@ -6,7 +6,7 @@ const { requireAuth } = require("../middleware/auth")
 const { Image } = require("../models/gallery")
 
 // Ruta de búsqueda de contenido (pública)
-router.get("/search", searchController.searchContent)
+router.get("/", searchController.searchContent)
 
 // APIs de búsqueda y seguimiento (requieren autenticación)
 router.get("/api/search/users", requireAuth, searchController.searchUsers)
