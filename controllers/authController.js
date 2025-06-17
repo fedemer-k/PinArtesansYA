@@ -2,33 +2,7 @@ const bcrypt = require("bcryptjs")
 const User = require("../models/user")
 const { generateToken, setTokenCookie, clearTokenCookie } = require("../config/jwt")
 const { redirectIfAuth } = require("../middleware/auth")
-const multer = require("multer")
-const path = require("path")
-
-// Configuración de multer para subida de archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads/profiles/")
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
-    cb(null, "profile-" + uniqueSuffix + path.extname(file.originalname))
-  },
-})
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true)
-    } else {
-      cb(new Error("Solo se permiten archivos de imagen"))
-    }
-  },
-})
+const { upload, handleMulterError } = require("../config/multer")
 
 exports.getLoginPage = [
   redirectIfAuth,
@@ -111,6 +85,7 @@ exports.getRegisterPage = [
 
 exports.processRegister = [
   upload.single("profileImage"),
+  handleMulterError,
   async (req, res) => {
     const { name, email, password, confirmPassword, interests } = req.body
 

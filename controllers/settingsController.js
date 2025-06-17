@@ -1,32 +1,6 @@
 const User = require("../models/user")
 const { requireAuth } = require("../middleware/auth")
-const multer = require("multer")
-const path = require("path")
-
-// Configuración de multer para subida de archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads/profiles/")
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
-    cb(null, "profile-" + uniqueSuffix + path.extname(file.originalname))
-  },
-})
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true)
-    } else {
-      cb(new Error("Solo se permiten archivos de imagen"))
-    }
-  },
-})
+const { upload, handleMulterError } = require("../config/multer")
 
 exports.getSettingsPage = [
   requireAuth,
@@ -53,6 +27,7 @@ exports.getSettingsPage = [
 exports.updateSettings = [
   requireAuth,
   upload.single("profileImage"),
+  handleMulterError,
   async (req, res) => {
     try {
       const { interests, showcaseMode } = req.body
@@ -69,7 +44,7 @@ exports.updateSettings = [
         email: user.email,
         imagen_perfil: user.imagen_perfil,
         intereses: interests,
-        modo_vitrina: parseInt(showcaseMode, 10)
+        modo_vitrina: Number.parseInt(showcaseMode, 10),
       }
 
       // Procesar imagen de perfil si se subió una nueva
