@@ -38,14 +38,15 @@ router.post("/:userId/follow", requireAuth, async (req, res) => {
 
     // Crear notificación
     const currentUser = await User.findById(currentUserId)
-    const targetUser = await User.findById(currentUserId)
+
     await Notificacion.create({
       mensaje: `${currentUser.nombre} te ha enviado una solicitud de seguimiento`,
       id_usuario: targetUserId,
       id_tiponotificacion: 1, // Seguimiento
     })
 
-    // Redirigir de vuelta al perfil
+    // Redirigir al perfil del usuario seguido y lo redirijo
+    const targetUser = await User.findById(targetUserId)
     res.redirect(`/profile/${req.query.redirect || targetUser.nombre}`)
   } catch (error) {
     console.error("Error al enviar solicitud de seguimiento:", error)
@@ -68,8 +69,11 @@ router.post("/:userId/unfollow", requireAuth, async (req, res) => {
     // Eliminar la relación de seguimiento
     await Seguimiento.delete(followRelation.id_amistad)
 
+    //Obtengo al usuario que deja de seguir
+    const targetUser = await User.findById(targetUserId)
+
     // Redirigir de vuelta al perfil
-    res.redirect(`/profile/${req.query.redirect || targetUserId}`)
+    res.redirect(`/profile/${req.query.redirect || targetUser.nombre}`)
   } catch (error) {
     console.error("Error al dejar de seguir:", error)
     res.status(500).send("Error al procesar la solicitud")
