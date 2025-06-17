@@ -1326,6 +1326,7 @@ body {
 
 input[type="checkbox"]:checked + label .toggle-switch {
   background: #d97706;
+  margin-right: 15px;
 }
 
 input[type="checkbox"]:checked + label .toggle-slider {

@@ -179,10 +179,10 @@ class User {
 
   static async update(id, userData) {
     try {
-      const { nombre, email, imagen_perfil, intereses, antecedentes } = userData
+      const { nombre, email, imagen_perfil, intereses, modo_vitrina } = userData
       await query(
-        "UPDATE Usuario SET nombre = ?, email = ?, imagen_perfil = ?, intereses = ?, antecedentes = ? WHERE id_usuario = ?",
-        [nombre, email, imagen_perfil, intereses, antecedentes, id]
+        "UPDATE Usuario SET nombre = ?, email = ?, imagen_perfil = ?, intereses = ?, modo_vitrina = ? WHERE id_usuario = ?",
+        [nombre, email, imagen_perfil, intereses, modo_vitrina, id]
       )
 
       return await User.findById(id)

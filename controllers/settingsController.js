@@ -68,8 +68,8 @@ exports.updateSettings = [
         nombre: user.nombre,
         email: user.email,
         imagen_perfil: user.imagen_perfil,
-        intereses: interests || user.intereses,
-        antecedentes: user.antecedentes,
+        intereses: interests,
+        modo_vitrina: parseInt(showcaseMode, 10)
       }
 
       // Procesar imagen de perfil si se subió una nueva

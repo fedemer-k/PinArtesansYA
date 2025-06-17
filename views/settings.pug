@@ -45,7 +45,7 @@ block content
                 if user.imagen_perfil
                   img(src=user.imagen_perfil, alt="Imagen actual", id="currentProfileImage")
                 else
-                  img(src="https://picsum.photos/120/120?random=user", alt="Imagen por defecto", id="currentProfileImage")
+                  img(src="/uploads/profiles/default.png", alt="Imagen por defecto", id="currentProfileImage")
               .file-input-group
                 input(type="file", id="profileImage", name="profileImage", accept="image/*")
                 .file-input-label
@@ -71,14 +71,15 @@ block content
           
           .form-group
             .checkbox-group.showcase-toggle
-              input(type="checkbox", id="showcaseMode", name="showcaseMode", checked=user.modo_vitrina)
+              if(user.modo_vitrina == 1)
+                input(type="checkbox", id="showcaseMode", name="showcaseMode", checked)
+              else 
+                input(type="checkbox", id="showcaseMode", name="showcaseMode")
               label(for="showcaseMode") 
                 .toggle-content
                   .toggle-info
                     strong Modo Vitrina
                     p Permite que otros usuarios vean tu perfil como una galería profesional
-                  .toggle-switch
-                    .toggle-slider
         
         if user.moderador
           .form-section.moderator-section
