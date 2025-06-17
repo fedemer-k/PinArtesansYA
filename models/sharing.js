@@ -14,7 +14,7 @@ class ImagenCompartida {
       await query("INSERT INTO ImagenCompartida (id_imagen, id_usuario, id_usuarioacompartir) VALUES (?, ?, ?)", [
         id_imagen,
         id_usuario,
-        id_usuarioacompartir,
+        id_usuarioacompartir
       ])
       return true
     } catch (error) {
@@ -30,7 +30,7 @@ class ImagenCompartida {
          FROM ImagenCompartida ic
          JOIN Usuario u ON ic.id_usuarioacompartir = u.id_usuario
          WHERE ic.id_imagen = ?`,
-        [imageId],
+        [imageId]
       )
       return results
     } catch (error) {
@@ -44,7 +44,7 @@ class ImagenCompartida {
       await query("DELETE FROM ImagenCompartida WHERE id_imagen = ? AND id_usuario = ? AND id_usuarioacompartir = ?", [
         imageId,
         userId,
-        sharedUserId,
+        sharedUserId
       ])
       return true
     } catch (error) {

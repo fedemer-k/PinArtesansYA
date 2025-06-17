@@ -196,7 +196,7 @@ static async getFromFollowing(userId) {
       const { titulo, descripcion, ruta_imagen, privacidad, id_album } = imageData
       const result = await query(
         "INSERT INTO Imagen (titulo, descripcion, ruta_imagen, privacidad, fecha_subida, id_album) VALUES (?, ?, ?, ?, CURDATE(), ?)",
-        [titulo, descripcion, ruta_imagen, privacidad, id_album],
+        [titulo, descripcion, ruta_imagen, privacidad, id_album]
       )
 
       return await Image.findById(result.insertId)
@@ -227,7 +227,7 @@ static async getFromFollowing(userId) {
         JOIN Usuario u ON a.id_usuario = u.id_usuario
         WHERE i.id_imagen = ?
       `,
-        [id],
+        [id]
       )
 
       if (results.length === 0) return null
@@ -261,7 +261,7 @@ static async getFromFollowing(userId) {
         JOIN Album a ON i.id_album = a.id_album
         WHERE i.id_imagen = ?
       `,
-        [id],
+        [id]
       )
 
       if (results.length === 0) return null
@@ -299,7 +299,7 @@ static async getFromFollowing(userId) {
         JOIN Usuario u ON a.id_usuario = u.id_usuario
         WHERE i.id_imagen = ?
       `,
-        [imageId],
+        [imageId]
       )
 
       if (results.length === 0) {
@@ -325,7 +325,7 @@ static async getFromFollowing(userId) {
           SELECT 1 FROM Seguimiento 
           WHERE id_usuario = ? AND id_usuarioseguido = ? AND id_estadosolicitud = 1
         `,
-          [userId, image.owner_id],
+          [userId, image.owner_id]
         )
         return followResults.length > 0
       }
@@ -337,7 +337,7 @@ static async getFromFollowing(userId) {
           SELECT 1 FROM ImagenCompartida 
           WHERE id_imagen = ? AND id_usuarioacompartir = ?
         `,
-          [imageId, userId],
+          [imageId, userId]
         )
         return sharedResults.length > 0
       }
@@ -353,7 +353,7 @@ static async getFromFollowing(userId) {
     try {
       const results = await query(
         "SELECT i.* FROM Imagen i JOIN Album a ON i.id_album = a.id_album WHERE a.id_usuario = ? ORDER BY i.fecha_subida DESC",
-        [userId],
+        [userId]
       )
       return results.map((img) => new Image(img))
     } catch (error) {
@@ -383,7 +383,7 @@ static async getFromFollowing(userId) {
         WHERE i.id_album = ? 
         ORDER BY i.fecha_subida DESC
       `,
-        [albumId],
+        [albumId]
       )
 
       return results.map((img) => ({
@@ -649,7 +649,7 @@ class Album {
         GROUP BY a.id_album
         ORDER BY a.titulo ASC
       `,
-        [userId],
+        [userId]
       )
 
       return results.map((album) => ({
@@ -708,7 +708,7 @@ class Comment {
         WHERE c.id_imagen = ?
         ORDER BY c.fecha DESC, c.id_comentario DESC
       `,
-        [imageId],
+        [imageId]
       )
 
       return results.map((comment) => ({
@@ -735,7 +735,7 @@ class Comment {
         JOIN Usuario u ON c.id_usuario = u.id_usuario
         WHERE c.id_comentario = ?
       `,
-        [commentId],
+        [commentId]
       )
 
       if (results.length === 0) return null
@@ -781,7 +781,7 @@ class Comment {
       const { texto, id_imagen, id_usuario } = commentData
       const result = await query(
         "INSERT INTO Comentario (texto, fecha, id_imagen, id_usuario) VALUES (?, CURDATE(), ?, ?)",
-        [texto, id_imagen, id_usuario],
+        [texto, id_imagen, id_usuario]
       )
 
       return await Comment.findById(result.insertId)
@@ -805,7 +805,7 @@ class Comment {
     try {
       const results = await query(
         "SELECT c.*, u.nombre as usuario_nombre FROM Comentario c JOIN Usuario u ON c.id_usuario = u.id_usuario WHERE c.id_imagen = ? ORDER BY c.fecha DESC",
-        [imageId],
+        [imageId]
       )
       return results.map((comment) => new Comment(comment))
     } catch (error) {

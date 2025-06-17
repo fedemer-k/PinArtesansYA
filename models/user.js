@@ -60,7 +60,7 @@ class User {
 
       const results = await query(
         "SELECT * FROM Seguimiento WHERE id_usuario = ? AND id_usuarioseguido = ? AND id_estadosolicitud = 1",
-        [followerId, followedId],
+        [followerId, followedId]
       )
       return results.length > 0
     } catch (error) {
@@ -79,7 +79,7 @@ class User {
 
       const results = await query(
         "SELECT COUNT(*) as count FROM Seguimiento WHERE id_usuarioseguido = ? AND id_estadosolicitud = 1",
-        [userId],
+        [userId]
       )
       return results[0].count
     } catch (error) {
@@ -141,7 +141,7 @@ class User {
         currentUserId || 0, // Para LEFT JOIN seguimiento
         currentUserId || 0, // Para excluir usuario actual
         searchPattern, // Para WHERE nombre
-        searchPattern, // Para WHERE intereses
+        searchPattern // Para WHERE intereses
       ]
 
       const results = await query(sql, params)
@@ -167,7 +167,7 @@ class User {
       const { nombre, email, contraseña, imagen_perfil, intereses } = userData
       const result = await query(
         "INSERT INTO Usuario (nombre, email, contraseña, imagen_perfil, intereses, fecha_registro, modo_vitrina, moderador, cuenta_suspendida) VALUES (?, ?, ?, ?, ?, CURDATE(), FALSE, FALSE, FALSE)",
-        [nombre, email, contraseña, imagen_perfil, intereses],
+        [nombre, email, contraseña, imagen_perfil, intereses]
       )
 
       return await User.findById(result.insertId)
@@ -182,7 +182,7 @@ class User {
       const { nombre, email, imagen_perfil, intereses, antecedentes } = userData
       await query(
         "UPDATE Usuario SET nombre = ?, email = ?, imagen_perfil = ?, intereses = ?, antecedentes = ? WHERE id_usuario = ?",
-        [nombre, email, imagen_perfil, intereses, antecedentes, id],
+        [nombre, email, imagen_perfil, intereses, antecedentes, id]
       )
 
       return await User.findById(id)

@@ -14,7 +14,7 @@ class Seguimiento {
     try {
       const results = await query("SELECT * FROM Seguimiento WHERE id_usuario = ? AND id_usuarioseguido = ?", [
         userId,
-        followedUserId,
+        followedUserId
       ])
       return results.length > 0 ? new Seguimiento(results[0]) : null
     } catch (error) {
@@ -138,7 +138,7 @@ class Notificacion {
       const { mensaje, id_usuario, id_tiponotificacion } = notificationData
       const result = await query(
         "INSERT INTO Notificacion (mensaje, leida, fecha, id_usuario, id_tiponotificacion) VALUES (?, FALSE, CURDATE(), ?, ?)",
-        [mensaje, id_usuario, id_tiponotificacion],
+        [mensaje, id_usuario, id_tiponotificacion]
       )
 
       return await Notificacion.findById(result.insertId)
@@ -162,7 +162,7 @@ class Notificacion {
     try {
       const results = await query(
         "SELECT * FROM Notificacion WHERE id_usuario = ? ORDER BY fecha DESC, id_notificacion DESC LIMIT ?",
-        [userId, limit],
+        [userId, limit]
       )
       return results.map((notification) => new Notificacion(notification))
     } catch (error) {
@@ -192,7 +192,7 @@ class Notificacion {
             n.id_usuario = ? 
         ORDER BY n.fecha DESC, n.id_notificacion DESC 
         LIMIT ?`,
-        [userId, limit],
+        [userId, limit]
       )
       return results.map((notification) => new Notificacion(notification))
     } catch (error) {
@@ -204,7 +204,7 @@ class Notificacion {
   static async getUnreadCount(userId) {
     try {
       const results = await query("SELECT COUNT(*) as count FROM Notificacion WHERE id_usuario = ? AND leida = FALSE", [
-        userId,
+        userId
       ])
       return results[0].count
     } catch (error) {
