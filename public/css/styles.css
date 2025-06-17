@@ -177,7 +177,6 @@ body {
   font-size: 14px;
   font-weight: 500;
   color: #262626;
-  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -222,7 +221,6 @@ body {
 }
 
 .user-info {
-  display: flex;
   align-items: center;
   gap: 0.75rem;
 }

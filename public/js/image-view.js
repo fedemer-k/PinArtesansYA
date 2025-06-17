@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } catch (error) {
           console.error("Error al eliminar comentario:", error)
-          showNotification("Error al eliminar comentario", "error")
+          showNotification(error, "error")
           button.disabled = false
           button.innerHTML = '<i class="fas fa-trash"></i>'
         }
