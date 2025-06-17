@@ -11,14 +11,16 @@ block content
             else
               img(src="/uploads/profiles/default.png", alt=owner.nombre)
           .owner-details
-            h3.owner-name= owner.nombre
+            h3.owner-name
+              a(href=`/profile/${owner.nombre}`)= owner.nombre
             if owner.moderador
               span.moderator-badge
                 i.fas.fa-shield-alt
                 | Moderador
             p.album-info
               i.fas.fa-folder
-              | Álbum: #{album.titulo}
+              | Álbum: 
+              a(href=`/albums/${album.id_album}`)= album.titulo
         
         .image-actions
           if user && user.id === owner.id_usuario
@@ -61,7 +63,8 @@ block content
                   img(src=comment.usuario_avatar, alt=comment.usuario_nombre)
                 .comment-content
                   .comment-header
-                    span.comment-author= comment.usuario_nombre
+                    span.comment-author
+                      a(href=`/profile/${comment.usuario_nombre}`)= comment.usuario_nombre
                     span.comment-date= new Date(comment.fecha).toLocaleDateString('es-ES')
                     if user && (user.id === comment.id_usuario || user.moderador)
                       button.delete-comment-btn(data-comment-id=comment.id_comentario, title="Eliminar comentario")
