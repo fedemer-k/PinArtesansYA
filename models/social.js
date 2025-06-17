@@ -175,22 +175,23 @@ class Notificacion {
     try {
       console.log("DESDE GETBYUSERWD userId:", userId, " typeof userID:", typeof userId, " limit:", limit, " typeof limit:", typeof limit);
       const results = await query(
-        `SELECT n.*, tn.tipo,
-         CASE 
-           WHEN tn.tipo LIKE '%Seguimiento%' AND s.id_estadosolicitud = 3 THEN s.id_amistad
-           ELSE NULL
-         END as follow_request_id
-         FROM Notificacion n
-         JOIN TipoNotificacion tn ON n.id_tiponotificacion = tn.id_tiponotificacion
-         LEFT JOIN Seguimiento s ON (
-           tn.tipo LIKE '%Seguimiento%' AND 
-           n.id_tiponotificacion = 1 AND
-           s.id_usuarioseguido = n.id_usuario AND
-           s.id_estadosolicitud = 3
-         )
-         WHERE n.id_usuario = ? 
-         ORDER BY n.fecha DESC, n.id_notificacion DESC 
-         LIMIT ?`,
+        `SELECT 
+            n.*, 
+            tn.tipo,
+            CASE 
+                WHEN tn.tipo LIKE '%Seguimiento%' AND n.id_tiponotificacion = 1 THEN s.id_amistad
+                ELSE NULL
+            END as follow_request_id
+        FROM Notificacion n
+        JOIN TipoNotificacion tn ON 
+            n.id_tiponotificacion = tn.id_tiponotificacion
+        LEFT JOIN Seguimiento s ON 
+            s.id_usuarioseguido = n.id_usuario 
+            AND s.id_estadosolicitud = 3
+        WHERE 
+            n.id_usuario = ? 
+        ORDER BY n.fecha DESC, n.id_notificacion DESC 
+        LIMIT ?`,
         [userId, limit],
       )
       return results.map((notification) => new Notificacion(notification))
