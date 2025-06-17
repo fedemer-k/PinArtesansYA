@@ -41,8 +41,9 @@ router.post("/:userId/follow", requireAuth, async (req, res) => {
 
     await Notificacion.create({
       mensaje: `${currentUser.nombre} te ha enviado una solicitud de seguimiento`,
-      id_usuario: targetUserId,
-      id_tiponotificacion: 1, // Seguimiento
+      id_usuario_propietario: targetUserId,
+      id_usuario_generador: currentUserId,
+      id_tiponotificacion: 1, 
     })
 
     // Redirigir al perfil del usuario seguido y lo redirijo

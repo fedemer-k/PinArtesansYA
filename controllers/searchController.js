@@ -70,7 +70,8 @@ exports.sendFollowRequest = async (req, res) => {
     const currentUser = await User.findById(currentUserId)
     await Notificacion.create({
       mensaje: `${currentUser.nombre} te ha enviado una solicitud de seguimiento`,
-      id_usuario: userId,
+      id_usuario_propietario: userId,
+      id_usuario_generador: currentUserId,
       id_tiponotificacion: 1, // Seguimiento
     })
 
@@ -119,7 +120,8 @@ exports.respondFollowRequest = async (req, res) => {
     // Crear notificación de respuesta
     await Notificacion.create({
       mensaje: notificationMessage,
-      id_usuario: followRequest.id_usuario,
+      id_usuario_propietario: followRequest.id_usuario,
+      id_usuario_generador: currentUserId,
       id_tiponotificacion: action === "accept" ? 2 : 3, // Aceptada o Rechazada
     })
 

@@ -127,7 +127,8 @@ class Notificacion {
     this.mensaje = data.mensaje
     this.leida = data.leida
     this.fecha = data.fecha
-    this.id_usuario = data.id_usuario
+    this.id_usuario_propietario = data.id_usuario_propietario
+    this.id_usuario_generador = data.id_usuario_generador
     this.id_tiponotificacion = data.id_tiponotificacion
     this.tipo = data.tipo
     this.follow_request_id = data.follow_request_id
@@ -135,10 +136,10 @@ class Notificacion {
 
   static async create(notificationData) {
     try {
-      const { mensaje, id_usuario, id_tiponotificacion } = notificationData
+      const { mensaje, id_usuario_propietario, id_usuario_generador , id_tiponotificacion } = notificationData
       const result = await query(
-        "INSERT INTO Notificacion (mensaje, leida, fecha, id_usuario, id_tiponotificacion) VALUES (?, FALSE, CURDATE(), ?, ?)",
-        [mensaje, id_usuario, id_tiponotificacion]
+        "INSERT INTO Notificacion (mensaje, leida, fecha, id_usuario_propietario, id_usuario_generador, id_tiponotificacion) VALUES (?, FALSE, CURDATE(), ?, ?, ?)",
+        [mensaje, id_usuario_propietario, id_usuario_generador, id_tiponotificacion]
       )
 
       return await Notificacion.findById(result.insertId)
@@ -161,7 +162,7 @@ class Notificacion {
   static async getByUser(userId, limit = 20) {
     try {
       const results = await query(
-        "SELECT * FROM Notificacion WHERE id_usuario = ? ORDER BY fecha DESC, id_notificacion DESC LIMIT ?",
+        "SELECT * FROM Notificacion WHERE id_usuario_propietario = ? ORDER BY fecha DESC, id_notificacion DESC LIMIT ?",
         [userId, limit]
       )
       return results.map((notification) => new Notificacion(notification))
@@ -173,25 +174,34 @@ class Notificacion {
 
   static async getByUserWithDetails(userId, limit = 20) {
     try {
-      console.log("DESDE GETBYUSERWD userId:", userId, " typeof userID:", typeof userId, " limit:", limit, " typeof limit:", typeof limit);
       const results = await query(
         `SELECT 
-            n.*, 
-            tn.tipo,
-            CASE 
-                WHEN tn.tipo LIKE '%Seguimiento%' AND n.id_tiponotificacion = 1 THEN s.id_amistad
-                ELSE NULL
-            END as follow_request_id
-        FROM Notificacion n
-        JOIN TipoNotificacion tn ON 
-            n.id_tiponotificacion = tn.id_tiponotificacion
-        LEFT JOIN Seguimiento s ON 
-            s.id_usuarioseguido = n.id_usuario 
-            AND s.id_estadosolicitud = 3
-        WHERE 
-            n.id_usuario = ? 
-        ORDER BY n.fecha DESC, n.id_notificacion DESC 
-        LIMIT ?`,
+n.*,
+tn.tipo,
+s.id_amistad AS follow_request_id,
+u.imagen_perfil
+FROM Notificacion n
+JOIN (
+SELECT MIN(id_notificacion) AS id_notificacion
+FROM Notificacion
+WHERE id_usuario_propietario = ?
+GROUP BY mensaje
+) AS unicas ON n.id_notificacion = unicas.id_notificacion
+JOIN TipoNotificacion tn ON n.id_tiponotificacion = tn.id_tiponotificacion
+LEFT JOIN Seguimiento s 
+ON s.id_usuarioseguido = n.id_usuario_propietario
+AND s.id_estadosolicitud = 3
+AND tn.tipo = 'Seguimiento'
+AND n.id_tiponotificacion = 1
+AND s.id_usuario = (
+SELECT u2.id_usuario
+FROM Usuario u2
+WHERE n.mensaje LIKE CONCAT(u2.nombre, '%')
+LIMIT 1
+)
+LEFT JOIN Usuario u ON u.id_usuario = n.id_usuario_propietario
+ORDER BY n.fecha DESC, n.id_notificacion DESC
+LIMIT ?`,
         [userId, limit]
       )
       return results.map((notification) => new Notificacion(notification))
@@ -203,9 +213,10 @@ class Notificacion {
 
   static async getUnreadCount(userId) {
     try {
-      const results = await query("SELECT COUNT(*) as count FROM Notificacion WHERE id_usuario = ? AND leida = FALSE", [
-        userId
-      ])
+      const results = await query(
+        "SELECT COUNT(*) as count FROM Notificacion WHERE id_usuario_propietario = ? AND leida = FALSE",
+        [userId]
+      )
       return results[0].count
     } catch (error) {
       console.error("Error al contar notificaciones no leídas:", error)
@@ -215,7 +226,7 @@ class Notificacion {
 
   static async markAsRead(id, userId) {
     try {
-      await query("UPDATE Notificacion SET leida = TRUE WHERE id_notificacion = ? AND id_usuario = ?", [id, userId])
+      await query("UPDATE Notificacion SET leida = TRUE WHERE id_notificacion = ? AND id_usuario_propietario = ?", [id, userId])
       return true
     } catch (error) {
       console.error("Error al marcar notificación como leída:", error)
@@ -225,7 +236,7 @@ class Notificacion {
 
   static async markAllAsRead(userId) {
     try {
-      await query("UPDATE Notificacion SET leida = TRUE WHERE id_usuario = ?", [userId])
+      await query("UPDATE Notificacion SET leida = TRUE WHERE id_usuario_propietario = ?", [userId])
       return true
     } catch (error) {
       console.error("Error al marcar todas las notificaciones como leídas:", error)
