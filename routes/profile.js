@@ -38,6 +38,7 @@ router.post("/:userId/follow", requireAuth, async (req, res) => {
 
     // Crear notificación
     const currentUser = await User.findById(currentUserId)
+    const targetUser = await User.findById(currentUserId)
     await Notificacion.create({
       mensaje: `${currentUser.nombre} te ha enviado una solicitud de seguimiento`,
       id_usuario: targetUserId,
@@ -45,7 +46,7 @@ router.post("/:userId/follow", requireAuth, async (req, res) => {
     })
 
     // Redirigir de vuelta al perfil
-    res.redirect(`/profile/${req.query.redirect || targetUserId}`)
+    res.redirect(`/profile/${req.query.redirect || targetUser.nombre}`)
   } catch (error) {
     console.error("Error al enviar solicitud de seguimiento:", error)
     res.status(500).send("Error al enviar solicitud")

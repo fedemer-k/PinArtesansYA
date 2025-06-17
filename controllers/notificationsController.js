@@ -25,32 +25,6 @@ exports.getNotificationsPage = [
   },
 ]
 
-exports.getNotificationsCount = [
-  requireAuth,
-  async (req, res) => {
-    try {
-      const count = await Notificacion.getUnreadCount(req.user.id)
-      res.json({ count })
-    } catch (error) {
-      console.error("Error al obtener contador de notificaciones:", error)
-      res.status(500).json({ success: false, message: "Error del servidor" })
-    }
-  },
-]
-
-exports.getRecentNotifications = [
-  requireAuth,
-  async (req, res) => {
-    try {
-      const notifications = await Notificacion.getByUserWithDetails(req.user.id, 5)
-      res.json(notifications)
-    } catch (error) {
-      console.error("Error al obtener notificaciones recientes:", error)
-      res.status(500).json({ success: false, message: "Error del servidor" })
-    }
-  },
-]
-
 exports.markAsRead = [
   requireAuth,
   async (req, res) => {

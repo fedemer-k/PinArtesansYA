@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Función para buscar usuarios
   async function searchUsers(query) {
     try {
-      const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`)
+      const response = await fetch(`/search/api/search/users?q=${encodeURIComponent(query)}`)
       const users = await response.json()
 
       if (users.length > 0) {
