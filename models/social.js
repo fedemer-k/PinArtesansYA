@@ -173,6 +173,7 @@ class Notificacion {
 
   static async getByUserWithDetails(userId, limit = 20) {
     try {
+      console.log("DESDE GETBYUSERWD userId:", userId, "limit:", limit, "typeof limit:", typeof limit);
       const results = await query(
         `SELECT n.*, tn.tipo,
          CASE 

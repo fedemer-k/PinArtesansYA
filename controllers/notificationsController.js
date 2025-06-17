@@ -6,6 +6,7 @@ exports.getNotificationsPage = [
   requireAuth,
   async (req, res) => {
     try {
+      console.log("DESDE NOTIFICATION CONTROLLER userId:", userId);
       const notifications = await Notificacion.getByUserWithDetails(req.user.id, 20)
       const pendingFollowRequests = await Seguimiento.getPendingRequests(req.user.id)
 
