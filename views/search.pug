@@ -1,0 +1,58 @@
+extends layout
+
+block content
+  .container
+    .search-container
+      .search-header
+        h2 Búsqueda de usuarios
+        if query
+          p.search-query Resultados para: "#{query}"
+      
+      .search-form-container
+        form.search-form(action="/search", method="POST")
+          .search-input-group
+            i.fas.fa-search
+            input(type="text", name="q", placeholder="Buscar personas...", value=query || "", required)
+          button.search-btn(type="submit") Buscar usuario
+      
+      if users && users.length > 0
+        .user-search-results
+          .search-results-header
+            h3 Usuarios encontrados
+            span.results-count #{users.length} resultado(s)
+          
+          .users-grid
+            each user in users
+              .user-card
+                .user-avatar-large
+                  img(src=user.imagen_perfil || "/uploads/profiles/default.png", alt=user.nombre)
+                  if user.moderador
+                    .moderator-indicator
+                      i.fas.fa-shield-alt
+                
+                .user-info
+                  h4.user-name= user.nombre
+                  if user.intereses
+                    p.user-interests= user.intereses.length > 100 ? user.intereses.substring(0, 100) + "..." : user.intereses
+                  if user.modo_vitrina
+                    span.showcase-badge
+                      i.fas.fa-star
+                      | Vitrina
+                
+                a.visit-profile-btn(href=`/profile/${user.nombre}`)
+                  i.fas.fa-user
+                  | Visitar perfil
+      
+      else if query
+        .no-results
+          .no-results-content
+            i.fas.fa-users.no-results-icon
+            h3 No se encontraron usuarios
+            p No hay usuarios que coincidan con tu búsqueda "#{query}".
+      
+      else
+        .no-results
+          .no-results-content
+            i.fas.fa-search.no-results-icon
+            h3 Buscar usuarios
+            p Ingresa un término de búsqueda para encontrar usuarios.

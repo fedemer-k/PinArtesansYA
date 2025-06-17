@@ -6,8 +6,10 @@ header.header
           h1 PinArtesans
       
       .search-bar
-        i.fas.fa-search
-        input(type="text", placeholder="Buscar personas...", id="searchInput")
+        form.search-form(action="/search", method="POST")
+          i.fas.fa-search
+          input(type="text", name="q", placeholder="Buscar personas...", id="searchInput", required)
+          button.search-btn(type="submit") Buscar usuario
       
       nav.nav-icons
         button.nav-btn

@@ -1,17 +1,14 @@
 const express = require("express")
 const router = express.Router()
 const searchController = require("../controllers/searchController")
-const notificationsController = require("../controllers/notificationsController")
-const { requireAuth } = require("../middleware/auth")
+const { getCurrentUser } = require("../middleware/auth")
 const { Image } = require("../models/gallery")
 
-// Ruta de búsqueda de contenido (pública)
+// Ruta de búsqueda de contenido (pública) - GET
 router.get("/", searchController.searchContent)
 
-// APIs de búsqueda y seguimiento (requieren autenticación)
-router.get("/api/search/users", requireAuth, searchController.searchUsers)
-router.post("/api/follow/:userId", requireAuth, searchController.sendFollowRequest)
-router.post("/api/follow/respond/:requestId", requireAuth, notificationsController.respondFollowRequest)
+// Nueva ruta para búsqueda de usuarios - POST
+router.post("/", getCurrentUser, searchController.searchUsersPage)
 
 // API de búsqueda de contenido
 router.get("/api/search/content", async (req, res) => {

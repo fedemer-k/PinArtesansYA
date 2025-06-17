@@ -38,6 +38,31 @@ exports.searchContent = async (req, res) => {
   }
 }
 
+// Nueva función para búsqueda de usuarios con vista
+exports.searchUsersPage = async (req, res) => {
+  try {
+    const { q: query } = req.body
+    const currentUserId = req.user ? req.user.id_usuario || req.user.id : null
+
+    let users = []
+    //verifico que existe y que tiene al menos 2 caracteres
+    if (query && query.trim().length >= 2) {
+      users = await User.searchByName(query.trim(), currentUserId)
+    }
+
+    res.render("search", {
+      title: query ? `Búsqueda de usuarios: ${query} - PinArtesans` : "Búsqueda de usuarios - PinArtesans",
+      query: query,
+      users: users,
+    })
+  } catch (error) {
+    console.error("Error en búsqueda de usuarios:", error)
+    res.status(500).render("errors/500", {
+      title: "Error del servidor - PinArtesans",
+    })
+  }
+}
+
 exports.sendFollowRequest = async (req, res) => {
   try {
     const { userId } = req.params
@@ -134,27 +159,6 @@ exports.respondFollowRequest = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error al procesar solicitud",
-    })
-  }
-}
-
-//Modo API para búsqueda de usuarios.
-exports.searchUsers = async (req, res) => {
-  try {
-    const { q: query } = req.query
-    const currentUserId = req.user ? req.user.id : null
-
-    if (!query || query.trim().length < 2) {
-      return res.json([])
-    }
-
-    const users = await User.searchByName(query.trim(), currentUserId)
-    res.json(users)
-  } catch (error) {
-    console.error("Error en búsqueda de usuarios:", error)
-    res.status(500).json({
-      success: false,
-      message: "Error al buscar usuarios",
     })
   }
 }

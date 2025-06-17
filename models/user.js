@@ -91,58 +91,24 @@ class User {
   static async searchByName(searchTerm, currentUserId = null) {
     try {
       const sql = `
-        SELECT 
+        SELECT DISTINCT
           u.id_usuario,
           u.nombre,
           u.email,
           u.imagen_perfil,
           u.intereses,
           u.modo_vitrina,
-          u.moderador,
-          CASE 
-            WHEN u.nombre LIKE ? THEN 1
-            WHEN u.nombre LIKE ? THEN 2
-            WHEN u.intereses LIKE ? THEN 3
-            ELSE 4
-          END as relevancia,
-          CASE 
-            WHEN s.id_estadosolicitud = 1 THEN 'following'
-            WHEN s.id_estadosolicitud = 3 AND s.id_usuario = ? THEN 'pending_sent'
-            WHEN s.id_estadosolicitud = 3 AND s.id_usuarioseguido = ? THEN 'pending_received'
-            WHEN s.id_estadosolicitud = 2 THEN 'rejected'
-            ELSE 'none'
-          END as follow_status
+          u.moderador
         FROM Usuario u
-        LEFT JOIN Seguimiento s ON (
-          (s.id_usuario = ? AND s.id_usuarioseguido = u.id_usuario) OR
-          (s.id_usuarioseguido = ? AND s.id_usuario = u.id_usuario)
-        )
-        WHERE 
-          u.cuenta_suspendida = FALSE 
+        WHERE u.cuenta_suspendida = FALSE
           AND u.id_usuario != ?
-          AND (
-            u.nombre LIKE ? OR 
-            u.intereses LIKE ?
-          )
-        ORDER BY relevancia ASC, u.nombre ASC
+          AND u.nombre LIKE ?
+        ORDER BY u.nombre ASC
         LIMIT 20
       `
 
       const searchPattern = `%${searchTerm}%`
-      const exactPattern = `${searchTerm}%`
-
-      const params = [
-        exactPattern, // Para relevancia 1 (coincidencia exacta al inicio)
-        searchPattern, // Para relevancia 2 (contiene el término)
-        searchPattern, // Para relevancia 3 (en intereses)
-        currentUserId || 0, // Para verificar pending_sent
-        currentUserId || 0, // Para verificar pending_received
-        currentUserId || 0, // Para LEFT JOIN seguimiento
-        currentUserId || 0, // Para LEFT JOIN seguimiento
-        currentUserId || 0, // Para excluir usuario actual
-        searchPattern, // Para WHERE nombre
-        searchPattern // Para WHERE intereses
-      ]
+      const params = [currentUserId || 0, searchPattern]
 
       const results = await query(sql, params)
 
@@ -150,11 +116,10 @@ class User {
         id: user.id_usuario,
         nombre: user.nombre,
         email: user.email,
-        imagen_perfil: user.imagen_perfil || "https://picsum.photos/80/80?random=" + user.id_usuario,
+        imagen_perfil: user.imagen_perfil || "/uploads/profiles/default.png",
         intereses: user.intereses,
         modo_vitrina: user.modo_vitrina,
-        moderador: user.moderador,
-        follow_status: user.follow_status,
+        moderador: user.moderador
       }))
     } catch (error) {
       console.error("Error al buscar usuarios:", error)
