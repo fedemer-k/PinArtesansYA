@@ -125,7 +125,7 @@ exports.deleteComment = [
         })
       }
 
-      if (comment.id_usuario !== userId && !req.user.moderador) {
+      if (comment.id_usuario !== userId) {
         return res.status(403).json({
           success: false,
           message: "No tienes permisos para eliminar este comentario",

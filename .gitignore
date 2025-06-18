@@ -47,8 +47,8 @@ jspm_packages/
 .env
 
 # Uploads
-public/uploads/*
-!public/uploads/.gitkeep
+#public/uploads/*
+#!public/uploads/.gitkeep
 
 # IDE
 .vscode/

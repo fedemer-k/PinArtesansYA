@@ -8,7 +8,7 @@ const { Image } = require("../models/gallery")
 // Rutas de imágenes individuales
 router.get("/:id", imageController.getImageView)
 router.post("/:id/comment", requireAuth, imageController.addComment)
-router.delete("/comment/:commentId", requireAuth, imageController.deleteComment)
+router.delete("/:id/comment/:commentId", requireAuth, imageController.deleteComment)
 
 // Rutas de gestión de imágenes (requieren autenticación)
 router.put("/:id", requireAuth, albumsController.updateImage)
