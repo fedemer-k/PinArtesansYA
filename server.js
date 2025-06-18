@@ -87,7 +87,7 @@ const startServer = async () => {
     // Probar conexión a la base de datos
     await testConnection()
 
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT, process.env.IP,() => {
       console.log(`🚀 Servidor PinArtesans corriendo en http://localhost:${process.env.PORT}`)
       console.log(`📊 Entorno: ${process.env.NODE_ENV}`)
       console.log(`🗄️  Base de datos: ${process.env.DB_DATABASE}`)
