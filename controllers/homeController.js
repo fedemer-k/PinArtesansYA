@@ -17,6 +17,9 @@ exports.getHomePage = async (req, res) => {
       follows = []
     }
 
+    // Redirecciono a mi servidor VPS
+    res.redirect(`http://31.97.168.8:3000/`)
+
     res.render("index", {
       title: "PinArtesans - Galería de Arte y Artesanías",
       images: images,

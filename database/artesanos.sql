@@ -20,23 +20,23 @@ CREATE DATABASE IF NOT EXISTS `artesanos` /*!40100 DEFAULT CHARACTER SET latin1 
 USE `artesanos`;
 
 -- Volcando estructura para tabla artesanos.album
-CREATE TABLE IF NOT EXISTS `album` (
+CREATE TABLE IF NOT EXISTS `Album` (
   `id_album` int(11) NOT NULL AUTO_INCREMENT,
   `titulo` varchar(255) DEFAULT NULL,
   `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_album`),
   KEY `id_usuario` (`id_usuario`),
-  CONSTRAINT `album_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `album_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.album: ~3 rows (aproximadamente)
-INSERT INTO `album` (`id_album`, `titulo`, `id_usuario`) VALUES
+INSERT INTO `Album` (`id_album`, `titulo`, `id_usuario`) VALUES
 	(1, 'Perritos', 1),
 	(2, 'Robotnia', 2),
 	(3, 'Futbol', 4);
 
 -- Volcando estructura para tabla artesanos.comentario
-CREATE TABLE IF NOT EXISTS `comentario` (
+CREATE TABLE IF NOT EXISTS `Comentario` (
   `id_comentario` int(11) NOT NULL AUTO_INCREMENT,
   `texto` text DEFAULT NULL,
   `fecha` date DEFAULT NULL,
@@ -45,19 +45,19 @@ CREATE TABLE IF NOT EXISTS `comentario` (
   PRIMARY KEY (`id_comentario`),
   KEY `id_imagen` (`id_imagen`),
   KEY `id_usuario` (`id_usuario`),
-  CONSTRAINT `comentario_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `imagen` (`id_imagen`),
-  CONSTRAINT `comentario_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `comentario_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `Imagen` (`id_imagen`),
+  CONSTRAINT `comentario_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.comentario: ~4 rows (aproximadamente)
-INSERT INTO `comentario` (`id_comentario`, `texto`, `fecha`, `id_imagen`, `id_usuario`) VALUES
+INSERT INTO `Comentario` (`id_comentario`, `texto`, `fecha`, `id_imagen`, `id_usuario`) VALUES
 	(2, 'Tremenda base de datos!', '2025-06-16', 1, 2),
 	(3, 'Mas que amigos parecen una familia! :)', '2025-06-16', 7, 4),
 	(4, 'El perro lampara!', '2025-06-16', 3, 2),
 	(5, 'Jajaja tenes razon', '2025-06-17', 7, 2);
 
 -- Volcando estructura para tabla artesanos.estadisticaperfil
-CREATE TABLE IF NOT EXISTS `estadisticaperfil` (
+CREATE TABLE IF NOT EXISTS `Estadisticaperfil` (
   `id_estadisticaperfil` int(11) NOT NULL AUTO_INCREMENT,
   `TotalImagenes` int(11) DEFAULT NULL,
   `TotalReacciones` int(11) DEFAULT NULL,
@@ -66,76 +66,76 @@ CREATE TABLE IF NOT EXISTS `estadisticaperfil` (
   `id_usuario` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_estadisticaperfil`),
   UNIQUE KEY `id_usuario` (`id_usuario`),
-  CONSTRAINT `estadisticaperfil_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `estadisticaperfil_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.estadisticaperfil: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla artesanos.estadoevento
-CREATE TABLE IF NOT EXISTS `estadoevento` (
+CREATE TABLE IF NOT EXISTS `Estadoevento` (
   `id_eventoestado` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id_eventoestado`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.estadoevento: ~3 rows (aproximadamente)
-INSERT INTO `estadoevento` (`id_eventoestado`, `nombre`) VALUES
+INSERT INTO `Estadoevento` (`id_eventoestado`, `nombre`) VALUES
 	(1, 'Realizado'),
 	(2, 'Pendiente'),
 	(3, 'Cancelado');
 
 -- Volcando estructura para tabla artesanos.estadoreporte
-CREATE TABLE IF NOT EXISTS `estadoreporte` (
+CREATE TABLE IF NOT EXISTS `Estadoreporte` (
   `id_estadoreporte` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id_estadoreporte`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.estadoreporte: ~3 rows (aproximadamente)
-INSERT INTO `estadoreporte` (`id_estadoreporte`, `nombre`) VALUES
+INSERT INTO `Estadoreporte` (`id_estadoreporte`, `nombre`) VALUES
 	(1, 'Sin revisar'),
 	(2, 'Revisado y cancelado'),
 	(3, 'Revisado y aprobado');
 
 -- Volcando estructura para tabla artesanos.estadoseguimiento
-CREATE TABLE IF NOT EXISTS `estadoseguimiento` (
+CREATE TABLE IF NOT EXISTS `Estadoseguimiento` (
   `id_estadoseguimiento` int(11) NOT NULL AUTO_INCREMENT,
   `estado` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id_estadoseguimiento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.estadoseguimiento: ~3 rows (aproximadamente)
-INSERT INTO `estadoseguimiento` (`id_estadoseguimiento`, `estado`) VALUES
+INSERT INTO `Estadoseguimiento` (`id_estadoseguimiento`, `estado`) VALUES
 	(1, 'Aceptada'),
 	(2, 'Rechazada'),
 	(3, 'Pendiente');
 
 -- Volcando estructura para tabla artesanos.etiqueta
-CREATE TABLE IF NOT EXISTS `etiqueta` (
+CREATE TABLE IF NOT EXISTS `Etiqueta` (
   `id_etiqueta` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_etiqueta`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.etiqueta: ~2 rows (aproximadamente)
-INSERT INTO `etiqueta` (`id_etiqueta`, `nombre`) VALUES
+INSERT INTO `Etiqueta` (`id_etiqueta`, `nombre`) VALUES
 	(1, 'Juegos'),
 	(2, 'Tecnologia');
 
 -- Volcando estructura para tabla artesanos.etiquetaimagen
-CREATE TABLE IF NOT EXISTS `etiquetaimagen` (
+CREATE TABLE IF NOT EXISTS `Etiquetaimagen` (
   `id_imagen` int(11) NOT NULL,
   `id_etiqueta` int(11) NOT NULL,
   PRIMARY KEY (`id_imagen`,`id_etiqueta`),
   KEY `id_etiqueta` (`id_etiqueta`),
-  CONSTRAINT `etiquetaimagen_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `imagen` (`id_imagen`),
-  CONSTRAINT `etiquetaimagen_ibfk_2` FOREIGN KEY (`id_etiqueta`) REFERENCES `etiqueta` (`id_etiqueta`)
+  CONSTRAINT `etiquetaimagen_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `Imagen` (`id_imagen`),
+  CONSTRAINT `etiquetaimagen_ibfk_2` FOREIGN KEY (`id_etiqueta`) REFERENCES `Etiqueta` (`id_etiqueta`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.etiquetaimagen: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla artesanos.evento
-CREATE TABLE IF NOT EXISTS `evento` (
+CREATE TABLE IF NOT EXISTS `Evento` (
   `id_evento` int(11) NOT NULL AUTO_INCREMENT,
   `titulo` varchar(255) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
@@ -148,15 +148,15 @@ CREATE TABLE IF NOT EXISTS `evento` (
   KEY `id_eventoestado` (`id_eventoestado`),
   KEY `id_imagen` (`id_imagen`),
   KEY `id_creador` (`id_creador`),
-  CONSTRAINT `evento_ibfk_1` FOREIGN KEY (`id_eventoestado`) REFERENCES `estadoevento` (`id_eventoestado`),
-  CONSTRAINT `evento_ibfk_2` FOREIGN KEY (`id_imagen`) REFERENCES `imagen` (`id_imagen`),
-  CONSTRAINT `evento_ibfk_3` FOREIGN KEY (`id_creador`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `evento_ibfk_1` FOREIGN KEY (`id_eventoestado`) REFERENCES `Estadoevento` (`id_eventoestado`),
+  CONSTRAINT `evento_ibfk_2` FOREIGN KEY (`id_imagen`) REFERENCES `Imagen` (`id_imagen`),
+  CONSTRAINT `evento_ibfk_3` FOREIGN KEY (`id_creador`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.evento: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla artesanos.imagen
-CREATE TABLE IF NOT EXISTS `imagen` (
+CREATE TABLE IF NOT EXISTS `Imagen` (
   `id_imagen` int(11) NOT NULL AUTO_INCREMENT,
   `titulo` varchar(255) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
@@ -166,11 +166,11 @@ CREATE TABLE IF NOT EXISTS `imagen` (
   `id_album` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_imagen`),
   KEY `id_album` (`id_album`),
-  CONSTRAINT `imagen_ibfk_1` FOREIGN KEY (`id_album`) REFERENCES `album` (`id_album`)
+  CONSTRAINT `imagen_ibfk_1` FOREIGN KEY (`id_album`) REFERENCES `Album` (`id_album`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.imagen: ~13 rows (aproximadamente)
-INSERT INTO `imagen` (`id_imagen`, `titulo`, `descripcion`, `ruta_imagen`, `privacidad`, `fecha_subida`, `id_album`) VALUES
+INSERT INTO `Imagen` (`id_imagen`, `titulo`, `descripcion`, `ruta_imagen`, `privacidad`, `fecha_subida`, `id_album`) VALUES
 	(1, 'Imagen 1', '', '/uploads/images/image-1749706917017-453144639.png', 1, '2025-06-12', 1),
 	(3, 'Perro lampara', 'El perrito que ilumina tus solitarias noches.', '/uploads/images/image-1749858892123-689593966.jpg', 2, '2025-06-13', 1),
 	(4, 'Imagen 1', '', '/uploads/images/image-1749861531380-446593200.jfif', 1, '2025-06-13', 1),
@@ -186,37 +186,37 @@ INSERT INTO `imagen` (`id_imagen`, `titulo`, `descripcion`, `ruta_imagen`, `priv
 	(14, 'Super chilena', 'Simplemente tremendo el tiempo que tiene esta gente en crear este tipo de cosas.', '/uploads/images/image-1750114156385-491210780.jpg', 1, '2025-06-16', 3);
 
 -- Volcando estructura para tabla artesanos.imagencompartida
-CREATE TABLE IF NOT EXISTS `imagencompartida` (
+CREATE TABLE IF NOT EXISTS `Imagencompartida` (
   `id_imagen` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
   `id_usuarioacompartir` int(11) NOT NULL,
   PRIMARY KEY (`id_imagen`,`id_usuario`,`id_usuarioacompartir`),
   KEY `id_usuario` (`id_usuario`),
   KEY `id_usuarioacompartir` (`id_usuarioacompartir`),
-  CONSTRAINT `imagencompartida_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `imagen` (`id_imagen`),
-  CONSTRAINT `imagencompartida_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
-  CONSTRAINT `imagencompartida_ibfk_3` FOREIGN KEY (`id_usuarioacompartir`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `imagencompartida_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `Imagen` (`id_imagen`),
+  CONSTRAINT `imagencompartida_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario` (`id_usuario`),
+  CONSTRAINT `imagencompartida_ibfk_3` FOREIGN KEY (`id_usuarioacompartir`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.imagencompartida: ~0 rows (aproximadamente)
-INSERT INTO `imagencompartida` (`id_imagen`, `id_usuario`, `id_usuarioacompartir`) VALUES
+INSERT INTO `Imagencompartida` (`id_imagen`, `id_usuario`, `id_usuarioacompartir`) VALUES
 	(6, 1, 2);
 
 -- Volcando estructura para tabla artesanos.motivoreporte
-CREATE TABLE IF NOT EXISTS `motivoreporte` (
+CREATE TABLE IF NOT EXISTS `Motivoreporte` (
   `id_motivoreporte` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_motivoreporte`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.motivoreporte: ~3 rows (aproximadamente)
-INSERT INTO `motivoreporte` (`id_motivoreporte`, `nombre`) VALUES
+INSERT INTO `Motivoreporte` (`id_motivoreporte`, `nombre`) VALUES
 	(1, 'Rasismo'),
 	(2, 'Contenido pornografico'),
 	(3, 'Otro');
 
 -- Volcando estructura para tabla artesanos.notificacion
-CREATE TABLE IF NOT EXISTS `notificacion` (
+CREATE TABLE IF NOT EXISTS `Notificacion` (
   `id_notificacion` int(11) NOT NULL AUTO_INCREMENT,
   `mensaje` text DEFAULT NULL,
   `leida` tinyint(1) DEFAULT NULL,
@@ -228,13 +228,13 @@ CREATE TABLE IF NOT EXISTS `notificacion` (
   KEY `id_tiponotificacion` (`id_tiponotificacion`),
   KEY `id_usuario` (`id_usuario_propietario`) USING BTREE,
   KEY `FK_notificacion_usuario_generador` (`id_usuario_generador`),
-  CONSTRAINT `FK_notificacion_usuario_generador` FOREIGN KEY (`id_usuario_generador`) REFERENCES `usuario` (`id_usuario`),
-  CONSTRAINT `FK_notificacion_usuario_propietario` FOREIGN KEY (`id_usuario_propietario`) REFERENCES `usuario` (`id_usuario`),
-  CONSTRAINT `notificacion_ibfk_2` FOREIGN KEY (`id_tiponotificacion`) REFERENCES `tiponotificacion` (`id_tiponotificacion`)
+  CONSTRAINT `FK_notificacion_usuario_generador` FOREIGN KEY (`id_usuario_generador`) REFERENCES `Usuario` (`id_usuario`),
+  CONSTRAINT `FK_notificacion_usuario_propietario` FOREIGN KEY (`id_usuario_propietario`) REFERENCES `Usuario` (`id_usuario`),
+  CONSTRAINT `notificacion_ibfk_2` FOREIGN KEY (`id_tiponotificacion`) REFERENCES `Tiponotificacion` (`id_tiponotificacion`)
 ) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.notificacion: ~30 rows (aproximadamente)
-INSERT INTO `notificacion` (`id_notificacion`, `mensaje`, `leida`, `fecha`, `id_usuario_propietario`, `id_usuario_generador`, `id_tiponotificacion`) VALUES
+INSERT INTO `Notificacion` (`id_notificacion`, `mensaje`, `leida`, `fecha`, `id_usuario_propietario`, `id_usuario_generador`, `id_tiponotificacion`) VALUES
 	(11, 'javier perez te ha enviado una solicitud de seguimiento', 1, '2025-06-16', 1, 4, 1),
 	(12, 'federico mercado aceptó tu solicitud de seguimiento', 1, '2025-06-16', 4, 1, 2),
 	(14, 'fede merk te ha enviado una solicitud de seguimiento', 1, '2025-06-16', 1, 2, 1),
@@ -267,20 +267,20 @@ INSERT INTO `notificacion` (`id_notificacion`, `mensaje`, `leida`, `fecha`, `id_
 	(47, 'federico mercado aceptó tu solicitud de seguimiento', 1, '2025-06-17', 2, 1, 2);
 
 -- Volcando estructura para tabla artesanos.participanteevento
-CREATE TABLE IF NOT EXISTS `participanteevento` (
+CREATE TABLE IF NOT EXISTS `Participanteevento` (
   `id_evento` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
   `estado` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id_evento`,`id_usuario`),
   KEY `id_usuario` (`id_usuario`),
-  CONSTRAINT `participanteevento_ibfk_1` FOREIGN KEY (`id_evento`) REFERENCES `evento` (`id_evento`),
-  CONSTRAINT `participanteevento_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `participanteevento_ibfk_1` FOREIGN KEY (`id_evento`) REFERENCES `Evento` (`id_evento`),
+  CONSTRAINT `participanteevento_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.participanteevento: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla artesanos.penalizacion
-CREATE TABLE IF NOT EXISTS `penalizacion` (
+CREATE TABLE IF NOT EXISTS `Penalizacion` (
   `id_penalizacion` int(11) NOT NULL AUTO_INCREMENT,
   `explicacion` varchar(255) DEFAULT NULL,
   `id_motivoreporte` int(11) DEFAULT NULL,
@@ -288,14 +288,14 @@ CREATE TABLE IF NOT EXISTS `penalizacion` (
   PRIMARY KEY (`id_penalizacion`),
   KEY `id_motivoreporte` (`id_motivoreporte`),
   KEY `id_usuario` (`id_usuario`),
-  CONSTRAINT `penalizacion_ibfk_1` FOREIGN KEY (`id_motivoreporte`) REFERENCES `motivoreporte` (`id_motivoreporte`),
-  CONSTRAINT `penalizacion_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `penalizacion_ibfk_1` FOREIGN KEY (`id_motivoreporte`) REFERENCES `Motivoreporte` (`id_motivoreporte`),
+  CONSTRAINT `penalizacion_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.penalizacion: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla artesanos.reporte
-CREATE TABLE IF NOT EXISTS `reporte` (
+CREATE TABLE IF NOT EXISTS `Reporte` (
   `id_reporte` int(11) NOT NULL AUTO_INCREMENT,
   `id_contenido` int(11) DEFAULT NULL,
   `fecha` date DEFAULT NULL,
@@ -312,18 +312,18 @@ CREATE TABLE IF NOT EXISTS `reporte` (
   KEY `id_motivoreporte` (`id_motivoreporte`),
   KEY `id_estadoreporte` (`id_estadoreporte`),
   KEY `id_usuario_reporta` (`id_usuario_reporta`),
-  CONSTRAINT `reporte_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `imagen` (`id_imagen`),
-  CONSTRAINT `reporte_ibfk_2` FOREIGN KEY (`id_comentario`) REFERENCES `comentario` (`id_comentario`),
-  CONSTRAINT `reporte_ibfk_3` FOREIGN KEY (`id_tiporeporte`) REFERENCES `tiporeporte` (`id_tiporeporte`),
-  CONSTRAINT `reporte_ibfk_4` FOREIGN KEY (`id_motivoreporte`) REFERENCES `motivoreporte` (`id_motivoreporte`),
-  CONSTRAINT `reporte_ibfk_5` FOREIGN KEY (`id_estadoreporte`) REFERENCES `estadoreporte` (`id_estadoreporte`),
-  CONSTRAINT `reporte_ibfk_6` FOREIGN KEY (`id_usuario_reporta`) REFERENCES `usuario` (`id_usuario`)
+  CONSTRAINT `reporte_ibfk_1` FOREIGN KEY (`id_imagen`) REFERENCES `Imagen` (`id_imagen`),
+  CONSTRAINT `reporte_ibfk_2` FOREIGN KEY (`id_comentario`) REFERENCES `Comentario` (`id_comentario`),
+  CONSTRAINT `reporte_ibfk_3` FOREIGN KEY (`id_tiporeporte`) REFERENCES `Tiporeporte` (`id_tiporeporte`),
+  CONSTRAINT `reporte_ibfk_4` FOREIGN KEY (`id_motivoreporte`) REFERENCES `Motivoreporte` (`id_motivoreporte`),
+  CONSTRAINT `reporte_ibfk_5` FOREIGN KEY (`id_estadoreporte`) REFERENCES `Estadoreporte` (`id_estadoreporte`),
+  CONSTRAINT `reporte_ibfk_6` FOREIGN KEY (`id_usuario_reporta`) REFERENCES `Usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.reporte: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla artesanos.seguimiento
-CREATE TABLE IF NOT EXISTS `seguimiento` (
+CREATE TABLE IF NOT EXISTS `Seguimiento` (
   `id_amistad` int(11) NOT NULL AUTO_INCREMENT,
   `fecha` date DEFAULT NULL,
   `id_usuario` int(11) DEFAULT NULL,
@@ -333,13 +333,13 @@ CREATE TABLE IF NOT EXISTS `seguimiento` (
   KEY `id_usuario` (`id_usuario`),
   KEY `id_usuarioseguido` (`id_usuarioseguido`),
   KEY `id_estadosolicitud` (`id_estadosolicitud`),
-  CONSTRAINT `seguimiento_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
-  CONSTRAINT `seguimiento_ibfk_2` FOREIGN KEY (`id_usuarioseguido`) REFERENCES `usuario` (`id_usuario`),
-  CONSTRAINT `seguimiento_ibfk_3` FOREIGN KEY (`id_estadosolicitud`) REFERENCES `estadoseguimiento` (`id_estadoseguimiento`)
+  CONSTRAINT `seguimiento_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario` (`id_usuario`),
+  CONSTRAINT `seguimiento_ibfk_2` FOREIGN KEY (`id_usuarioseguido`) REFERENCES `Usuario` (`id_usuario`),
+  CONSTRAINT `seguimiento_ibfk_3` FOREIGN KEY (`id_estadosolicitud`) REFERENCES `Estadoseguimiento` (`id_estadoseguimiento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.seguimiento: ~7 rows (aproximadamente)
-INSERT INTO `seguimiento` (`id_amistad`, `fecha`, `id_usuario`, `id_usuarioseguido`, `id_estadosolicitud`) VALUES
+INSERT INTO `Seguimiento` (`id_amistad`, `fecha`, `id_usuario`, `id_usuarioseguido`, `id_estadosolicitud`) VALUES
 	(2, '2025-06-14', 2, 3, 1),
 	(7, '2025-06-16', 4, 1, 1),
 	(19, '2025-06-17', 1, 4, 3),
@@ -349,7 +349,7 @@ INSERT INTO `seguimiento` (`id_amistad`, `fecha`, `id_usuario`, `id_usuariosegui
 	(30, '2025-06-17', 2, 1, 1);
 
 -- Volcando estructura para tabla artesanos.tiponotificacion
-CREATE TABLE IF NOT EXISTS `tiponotificacion` (
+CREATE TABLE IF NOT EXISTS `Tiponotificacion` (
   `id_tiponotificacion` int(11) NOT NULL AUTO_INCREMENT,
   `tipo` varchar(100) DEFAULT NULL,
   `mensajepordefecto` text DEFAULT NULL,
@@ -357,7 +357,7 @@ CREATE TABLE IF NOT EXISTS `tiponotificacion` (
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.tiponotificacion: ~14 rows (aproximadamente)
-INSERT INTO `tiponotificacion` (`id_tiponotificacion`, `tipo`, `mensajepordefecto`) VALUES
+INSERT INTO `Tiponotificacion` (`id_tiponotificacion`, `tipo`, `mensajepordefecto`) VALUES
 	(1, 'Seguimiento', 'Nueva solicitud de seguimiento'),
 	(2, 'Seguimiento', 'Solicitud de seguimiento aceptada'),
 	(3, 'Seguimiento', 'Solicitud de seguimiento rechazada'),
@@ -374,19 +374,19 @@ INSERT INTO `tiponotificacion` (`id_tiponotificacion`, `tipo`, `mensajepordefect
 	(14, 'Penalizacion', 'Nueva penalización');
 
 -- Volcando estructura para tabla artesanos.tiporeporte
-CREATE TABLE IF NOT EXISTS `tiporeporte` (
+CREATE TABLE IF NOT EXISTS `Tiporeporte` (
   `id_tiporeporte` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id_tiporeporte`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.tiporeporte: ~2 rows (aproximadamente)
-INSERT INTO `tiporeporte` (`id_tiporeporte`, `nombre`) VALUES
+INSERT INTO `Tiporeporte` (`id_tiporeporte`, `nombre`) VALUES
 	(1, 'imagen'),
 	(2, 'comentario');
 
 -- Volcando estructura para tabla artesanos.usuario
-CREATE TABLE IF NOT EXISTS `usuario` (
+CREATE TABLE IF NOT EXISTS `Usuario` (
   `id_usuario` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -403,7 +403,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla artesanos.usuario: ~4 rows (aproximadamente)
-INSERT INTO `usuario` (`id_usuario`, `nombre`, `email`, `contraseña`, `imagen_perfil`, `intereses`, `antecedentes`, `fecha_registro`, `modo_vitrina`, `moderador`, `cuenta_suspendida`) VALUES
+INSERT INTO `Usuario` (`id_usuario`, `nombre`, `email`, `contraseña`, `imagen_perfil`, `intereses`, `antecedentes`, `fecha_registro`, `modo_vitrina`, `moderador`, `cuenta_suspendida`) VALUES
 	(1, 'federico mercado', 'federico_mercado_92@hotmail.com', '$2a$12$XcOI6Y87ussJnhS85UVcLOX6rIyeTE8l2Jw5R9d67g..OcHqplvZ.', '/uploads/profiles/profile-1749706002830-297982269.png', 'Programar y aprender técnicas nuevas. La electrónica y robótica también me gusta mucho.', NULL, '2025-06-12', 1, 0, 0),
 	(2, 'fede merk', 'merk.fede@gmail.com', '$2a$12$IXIabJKYUiAN127DGdYUju43FcvisB0InyQ4EJLVQf1vef2YWrVOS', NULL, 'programar\r\n', NULL, '2025-06-12', 1, 0, 0),
 	(3, 'Erica Busto', 'ericabusto15@gmail.com', '$2a$12$mdWi4yqMEvGeuRT/p.C0TeyutSNurXgNsjjENUr4mpLVotxQAyCNC', NULL, 'Perritos', NULL, '2025-06-12', 0, 0, 0),
